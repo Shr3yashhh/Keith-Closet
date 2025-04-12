@@ -1,0 +1,158 @@
+/* header brand name  */
+.brand-name {
+    font-size: 30px;
+    color: #fff;
+    margin-left: 4px;
+}
+.brand-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.brand-logo img {
+    margin-top: -12px;
+}
+
+/* home search field  */
+#home_search {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    width: 70%;
+    border: 2px solid blue;
+}
+#home_search_submit_btn {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    width: 30%;
+    border: 2px solid green;
+}
+
+@media screen and (max-width: 768px) {
+   
+    .home-search-form{
+        margin-top: 50px;
+    }
+    .iphone-wrap{
+        display: none;
+    }
+    .hero-section, .hero-section > .container > .row {
+        height: 100vh;
+        min-height: auto;
+      }
+      .section-heading{
+        font-size: 1.8rem;
+        text-align: center;
+      }
+
+    
+}
+.profession-section{
+    padding-top: 0 !important;
+}
+
+/* get started section  */
+.get-started-text{
+    font-size: 3rem;
+}
+@media screen and (max-width: 768px) {
+    .get-started-text{
+        font-size: 2rem;
+    }
+
+    .section{
+        padding:2rem 0;
+    }
+    .get-started-btns{
+        margin: 2px;
+    }
+
+    
+}
+
+/* home search result found  */
+.profile-img {
+    display: block;
+    overflow: hidden;
+    }
+    .profile-img img {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 2px solid #c7c7c7;
+    }
+    .profile-img i {
+    position: absolute;
+    top: 20px;
+    left: 84px;
+    }
+    
+    .cardHover:hover{
+     box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+     background-color: #f2f3ff;  
+     }
+    .request-form{
+            display: flex;
+                justify-content: center;
+                    align-items: center;
+
+            }
+     @media(max-width: 767px) {
+        .d-inline-flex{
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .profile-img img{
+            margin-bottom: 5px;
+        }
+        .btn {
+
+            padding: 9px 30px !important;
+        }
+       
+        .profile-img i {
+            top: 20px;
+            left:  170px;
+        }
+
+        @media screen and (max-width: 424px) {
+            
+           
+            .profile-img i {
+                top: 20px;
+                left: 168px;
+            }
+        }
+        @media screen and (max-width: 374px) {
+            
+            .h4{
+                font-size: 18px;
+            }
+            .profile-img i {
+                top: 20px;
+                left: 150px;
+            }
+        }
+            
+        }
+        
+   /* phone img     */
+   .phone_img{
+    position: relative;
+    top: -80px;
+   }
+
+   .footer-heading{
+    border-left: 2px solid #c7c7c7;
+    border-bottom: 2px solid #c7c7c7;
+    padding: 8px 12px;
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+   }
+   .footer{
+    margin-top: 5px;
+    background: #e9eaeb57;
+    padding: 8px 12px;
+   }
+     
+    

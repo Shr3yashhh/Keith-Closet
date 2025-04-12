@@ -1,0 +1,7 @@
+@include('provider.layouts.header')
+@include('provider.layouts.sidebar')
+@include('provider.layouts.footer')
+@yield('header')
+@yield('sidebar')
+@yield('content')
+@yield('footer')

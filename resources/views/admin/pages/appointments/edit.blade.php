@@ -28,13 +28,13 @@
          <div class="col-md-12">
              <div class="card">
                  <div class="card-header">
-                     <h3 class="card-title"> <i class="fas fa-edit mr-2"></i><b>Edit appointment</b> </h3><a href="{{route('professions.index')}}" class="btn btn-sm btn-info " style="float: right !important;"> <i class="fas fa-eye mr-1"></i> View appointment</a>
+                     <h3 class="card-title"> <i class="fas fa-edit mr-2"></i><b>Edit Product</b> </h3><a href="{{route('admin.appointments')}}" class="btn btn-sm btn-info " style="float: right !important;"> <i class="fas fa-eye mr-1"></i> View Product</a>
                  </div>
                  <div class="card-body">
                     <form action="{{route('admin.appointment.update',$appointment->id)}}" method="POST" enctype="multipart/form-data">
                         @csrf
 {{--                        @method('PUT')--}}
-                        <div class="form-group">
+                        {{-- <div class="form-group">
                             <label for="doctor">Doctor</label>
                             <select class="form-control" name="doctor" placeholder="Enter Name">
                                 <option value="{{ $appointment->doctor->id }}" default> {{ $appointment->doctor->name }}</option>
@@ -59,25 +59,65 @@
                             <span class="text-danger">{{$message}}</span>
 
                             @enderror
+                        </div> --}}
+
+                        <div class="form-group">
+                            <label for="name">name</label>
+                            <input class="form-control" value="{{ $appointment->name }}" name="name" placeholder="Enter name"></input>
+
+                            @error('name')
+                            <span class="text-danger">{{$message}}</span>
+                            @enderror
                         </div>
                         <div class="form-group">
+                            <label for="sku">sku</label>
+                            <input class="form-control" name="sku" value="{{ $appointment->sku }}" placeholder="Enter sku"></input>
+
+                            @error('sku')
+                            <span class="text-danger">{{$message}}</span>
+                            @enderror
+                        </div>
+                        <div class="form-group">
+                            <label for="size">size</label>
+                            <input class="form-control" name="size" value="{{ $appointment->size }}" placeholder="Enter size"></input>
+
+                            @error('size')
+                            <span class="text-danger">{{$message}}</span>
+                            @enderror
+                        </div>
+                        <div class="form-group">
+                            <label for="sex">sex</label>
+                            <input class="form-control" name="sex" value="{{ $appointment->sex }}" placeholder="Enter sex"></input>
+
+                            @error('sex')
+                            <span class="text-danger">{{$message}}</span>
+                            @enderror
+                        </div>
+                        <div class="form-group">
+                            <label for="category">category</label>
+                            <input class="form-control" name="category" value="{{ $appointment->category }}" placeholder="Enter category"></input>
+
+                            @error('category')
+                            <span class="text-danger">{{$message}}</span>
+                            @enderror
+                        </div>
+
+                        {{-- <div class="form-group">
                             <label for="description">Description</label>
                             <textarea class="form-control" value="{{ $appointment->description }}" name="description" placeholder="Enter Description">{{ $appointment->description }}</textarea>
 
                             @error('description')
                             <span class="text-danger">{{$message}}</span>
                             @enderror
-                        </div>
-                        <div class="form-group">
+                        </div> --}}
+                        {{-- <div class="form-group">
                             <label for="date">Date</label>
-{{--                            @dd($appointment->date)--}}
-                            {{--                            <textarea class="form-control" name="description" placeholder="Enter Meta Description"></textarea>--}}
                             <input type="date" value="{{ \Carbon\Carbon::parse($appointment->date)->format("Y-m-d") }}" class="form-control" name="date" placeholder="Enter Date" />
 
                             @error('description')
                             <span class="text-danger">{{$message}}</span>
                             @enderror
-                        </div>
+                        </div> --}}
 
                         <button type="submit" class="btn btn-primary">Update</button>
                     </form>

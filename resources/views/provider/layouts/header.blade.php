@@ -138,7 +138,7 @@
 {{--          @endif--}}
 
 
-          <a href="{{route('provider.requestList',Session::get('session_provider')->id)}}" class="dropdown-item dropdown-footer">See All Notifications</a>
+          {{-- <a href="{{route('provider.requestList',Session::get('session_provider')->id)}}" class="dropdown-item dropdown-footer">See All Notifications</a> --}}
         </div>
       </li>
       <li class="nav-item">

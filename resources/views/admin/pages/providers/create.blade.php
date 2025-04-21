@@ -4,7 +4,7 @@
          <div class="col-md-12">
              <div class="card">
                  <div class="card-header">
-                     <h3 class="card-title"> <i class="fas fa-plus mr-2"></i><b>Add New Doctor</b> </h3><a href="{{route('professions.index')}}" class="btn btn-sm btn-info " style="float: right !important;"> <i class="fas fa-eye mr-1"></i> View Doctor</a>
+                     <h3 class="card-title"> <i class="fas fa-plus mr-2"></i><b>Add New Admin</b> </h3><a href="{{route('professions.index')}}" class="btn btn-sm btn-info " style="float: right !important;"> <i class="fas fa-eye mr-1"></i> View Admin</a>
                  </div>
                  <div class="card-body">
                     <form action="{{route('admin.provider.store')}}" method="POST" enctype="multipart/form-data">

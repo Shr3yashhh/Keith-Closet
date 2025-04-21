@@ -13,7 +13,15 @@ class Orders extends Migration
      */
     public function up()
     {
-        //
+        Schema::create('orders', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('sender_warehouse_id')->constrained('warehouses')->onDelete('cascade');
+            $table->foreignId('receiver_warehouse_id')->constrained('warehouses')->onDelete('cascade');
+            $table->integer('quantity')->unsigned();
+            $table->string('status', 50)->default('pending');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -23,6 +31,6 @@ class Orders extends Migration
      */
     public function down()
     {
-        //
+        Schema::dropIfExists('orders');
     }
 }

@@ -11,15 +11,15 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          @if (Session::get('session_provider')->avatar != null && Session::get('session_provider')->role == 'provider')
+          {{-- @if (Session::get('session_provider')->avatar != null && Session::get('session_provider')->role == 'provider')
             <img src="{{url('provider_avatar/'.Session::get('session_provider')->avatar)}}" class="img-circle elevation-2" alt="{{Session::get('session_provider')->name}}">
             @else
                 <img src="{{url('provider_avatar/default.jpg')}}" class="img-circle elevation-2" alt="{{Session::get('session_provider')->name}}">
 
-          @endif
+          @endif --}}
         </div>
         <div class="info">
-          <a href="{{route('providers.edit',Session::get('session_provider')->id)}}" class="d-block">{{Session::get('session_provider')->name}}</a>
+          {{-- <a href="{{route('providers.edit',Session::get('session_provider')->id)}}" class="d-block">{{Session::get('session_provider')->name}}</a> --}}
         </div>
       </div>
 

@@ -4,12 +4,12 @@
 
 <div class="d-flex justify-content-between">
     <div>
-        <h4 class="mt-2"><i class="fa fa-users mr-1 "></i> List of Appointment</h4>
+        <h4 class="mt-2"><i class="fa fa-users mr-1 "></i> List of Products </h4>
     </div>
     <div class="mt-2">
-        <a href="{{ route("appointment.show") }}">
+        <a href="{{ route("admin.appointment.show") }}">
             <button class="btn-info">
-                Add Appointment
+                Add Product
             </button>
         </a>
     </div>
@@ -33,29 +33,29 @@
   <div class="tab-content" id="nav-tabContent">
     <div class="tab-pane fade  show active" id="nav-active" role="tabpanel" aria-labelledby="nav-home-tab">
 
+        {{-- @dd($appointments) --}}
       @if ($appointments)
 
           <table class="table table-bordered table-hover">
         <tr>
           <th>SN</th>
-          <th>Patient Name</th>
-          <th>Doctor Name</th>
-          <th>Description</th>
-          <th>Date</th>
-            <th>Status</th>
+          <th>Name</th>
+          <th>sex</th>
+          <th>size</th>
+          <th>category</th>
             <th>Action</th>
         </tr>
         @foreach ($appointments as $key => $appointment)
         <tr>
 {{--            @dd($appointment)--}}
           <td>{{ ++$key }}</td>
-          <td>{{ $appointment->patient->name }}</td>
-          <td>{{ $appointment->doctor->name }}</td>
-          <td>{{ $appointment->description }}</td>
-            <td>{{ $appointment->date }}</td>
+          <td>{{ $appointment->name }}</td>
+          <td>{{ $appointment->sex }}</td>
+          <td>{{ $appointment->size }}</td>
+            <td>{{ $appointment->category }}</td>
 
 
-            <td>
+            {{-- <td>
                 @if($appointment->status == 'pending')
                     <button data-toggle="modal" data-target="#activeModal{{$key}}" class=" btn btn-sm btn-warning">{{ $appointment->status }}</button>
                 @elseif($appointment->status == 'in_review')
@@ -66,7 +66,6 @@
                     <button data-toggle="modal" data-target="#activeModal{{$key}}" class="btn btn-sm btn-success">{{ $appointment->status }}</button>
                 @endif
 
-                {{-- modal start --}}
                 <div class="modal fade" id="activeModal{{$key}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -98,8 +97,7 @@
                     </div>
                 </div>
 
-                {{-- modal end --}}
-            </td>
+            </td> --}}
 
 
           <td>
@@ -111,7 +109,7 @@
       </table>
       @else
       <p class="mt-3" style="color: red">
-        There are no active users.
+        There are no Products.
       </p>
 
       @endif

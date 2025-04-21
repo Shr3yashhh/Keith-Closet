@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class Products extends Migration
+class ProductWarehouse extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,11 @@ class Products extends Migration
      */
     public function up()
     {
-        Schema::create('products', function (Blueprint $table) {
+        Schema::create('product_warehouses', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100);
-            $table->string("sku", 100)->unique();
-            $table->string('size', 50)->nullable();
-            $table->string('category', 50)->nullable();
-            $table->string('sex', 10)->nullable();
+            $table->foreignId('warehouse_id')->constrained('warehouses')->onDelete('cascade');
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
+            $table->integer('quantity')->unsigned()->default(0);
             $table->timestamps();
         });
     }
@@ -31,6 +29,6 @@ class Products extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('products');
+        Schema::dropIfExists('product_warehouses');
     }
 }

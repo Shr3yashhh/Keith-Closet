@@ -12,7 +12,7 @@ Route::group(['prefix' => 'provider-panel'],function(){
     Route::resource('providers',ProviderController::class);
     Route::post('login',[ProviderController::class,'verify'])->name('provider.verify');
 
-    Route::group(['middleware' => 'providerLoginAuth'],function(){
+    Route::group([],function(){
         Route::any('change-password/{id}',[ProviderController::class,'changePassword'])->name('provider.changePassword');
 
         Route::get('/logout',[ProviderDashboardController::class,'logout'])->name('provider.logout');

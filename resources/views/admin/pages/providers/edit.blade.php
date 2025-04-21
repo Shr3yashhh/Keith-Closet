@@ -28,7 +28,7 @@
          <div class="col-md-12">
              <div class="card">
                  <div class="card-header">
-                     <h3 class="card-title"> <i class="fas fa-edit mr-2"></i><b>Edit Doctor</b> </h3><a href="{{route('admin.providers')}}" class="btn btn-sm btn-info " style="float: right !important;"> <i class="fas fa-eye mr-1"></i> View Doctor</a>
+                     <h3 class="card-title"> <i class="fas fa-edit mr-2"></i><b>Edit Admin</b> </h3><a href="{{route('admin.providers')}}" class="btn btn-sm btn-info " style="float: right !important;"> <i class="fas fa-eye mr-1"></i> View Admin</a>
                  </div>
                  <div class="card-body">
                     <form action="{{route('admin.provider.update',$provider->id)}}" method="POST" enctype="multipart/form-data">

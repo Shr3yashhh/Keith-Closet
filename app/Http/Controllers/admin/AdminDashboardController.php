@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\Bed;
+use App\Models\Product;
 use App\Models\Profession;
 use App\Models\RequestedService;
 use App\Models\Test;
@@ -76,10 +77,10 @@ class AdminDashboardController extends Controller
     }
     public function listProviders()
     {
-        $active_providers = User::where('role', 'doctor')->where('status','active')->get();
-        $new_providers = User::where('role', 'doctor')->where('status','new')->get();
-        $trashed_providers = User::onlyTrashed()->where('role', 'doctor')->get();
-        $suspended_providers = User::where('role', 'doctor')->where('status','suspended')->get();
+        $active_providers = User::where('role', 'admin')->where('status','active')->get();
+        $new_providers = User::where('role', 'admin')->where('status','new')->get();
+        $trashed_providers = User::onlyTrashed()->where('role', 'admin')->get();
+        $suspended_providers = User::where('role', 'admin')->where('status','suspended')->get();
         return view('admin.pages.providers.index',[
             'active_providers' => $active_providers,
             'new_providers' => $new_providers,
@@ -126,11 +127,11 @@ class AdminDashboardController extends Controller
             "password" => "required|string",
         ]);
         $requestUser["password"] = Hash::make($requestUser["password"]);
-        $requestUser["role"] = "doctor";
+        $requestUser["role"] = "admin";
         $requestUser["status"] = "active";
         $use = User::insert($requestUser);
 
-        return redirect()->route('admin.providers')->with('success','Doctor created successfully');
+        return redirect()->route('admin.providers')->with('success','admin created successfully');
     }
 
     public function showProvider()
@@ -146,16 +147,14 @@ class AdminDashboardController extends Controller
 
     public function updateProvider(Request $request, $id)
     {
-        $requestProvider = $request->validate([
+        $requestUser = $request->validate([
             "name" => "required|string",
             "email" => "required|email",
             "phone" => "required|string",
             "address" => "required|string",
             "password" => "required|string",
         ]);
-        dd($requestProvider);
         $user = User::findOrFail($id);
-
 
 //        if($request->hasFile('avatar')){
 //            $file = $request->file('avatar');
@@ -170,11 +169,11 @@ class AdminDashboardController extends Controller
 //
 //        }
 
-        $user->name = $requestProvider->name;
-        $user->email = $requestProvider->email;
+        $user->name = $requestUser->name;
+        $user->email = $requestUser->email;
 
-        $user->meta_description = $requestProvider->phone_number;
-        $user->description = $requestProvider->address;
+        $user->meta_description = $requestUser->phone_number;
+        $user->description = $requestUser->address;
 //        if($request->hasFile('avatar')){
 //            $user->avatar = $fileName;
 //        }
@@ -297,10 +296,7 @@ class AdminDashboardController extends Controller
 
     public function listAppointment()
     {
-        $appointments = Appointment::with([
-            "patient",
-            "doctor",
-        ])->get();
+        $appointments = Product::get();
 
         return view('admin.pages.appointments.index',[
             "appointments" => $appointments,
@@ -323,15 +319,15 @@ class AdminDashboardController extends Controller
         $requestAppointment = $request->all();
         $requestAppointment["status"] = "pending";
         $createData = [
-            "doctor_id" => $requestAppointment["doctor"],
-            "patient_id" => $requestAppointment["user"],
-            "status" => "pending",
-            "description" => $requestAppointment["description"],
-            "date" => $requestAppointment["date"],
+            "name" => $requestAppointment["name"],
+            "sku" => $requestAppointment["sku"],
+            "size" => $requestAppointment["size"],
+            "sex" => $requestAppointment["sex"],
+            "category" => $requestAppointment["category"],
         ];
-        $user = Appointment::insert($createData);
+        $product = Product::insert($createData);
 
-        return redirect()->route('admin.appointments')->with('success','User created successfully');
+        return redirect()->route('admin.appointments')->with('success','Product created successfully');
     }
 
     public function showAppointment()
@@ -346,13 +342,11 @@ class AdminDashboardController extends Controller
 
     public function editAppointment($id)
     {
-        $appointment = Appointment::with("patient", "doctor")->findOrFail($id);
-        $doctors = User::whereRoleAndStatus("doctor", "active")->get();
-        $users = User::whereRoleAndStatus("user", "active")->get();
+        $appointment = Product::findOrFail($id);
         return view('admin.pages.appointments.edit',[
             'appointment' => $appointment,
-            "doctors" => $doctors,
-            "users" => $users,
+            "doctors" => [],
+            "users" => [],
         ]);
     }
 
@@ -366,13 +360,13 @@ class AdminDashboardController extends Controller
 //            "password" => "required|string",
 //        ]);
         $requestAppointment = $request->all();
-        $appointment = Appointment::findOrFail($id);
+        $appointment = Product::findOrFail($id);
         $updateData = [
-            "doctor_id" => $requestAppointment["doctor"],
-            "patient_id" => $requestAppointment["user"],
-            "status" => "pending",
-            "description" => $requestAppointment["description"],
-            "date" => $requestAppointment["date"],
+            "name" => $requestAppointment["name"],
+            "sku" => $requestAppointment["sku"],
+            "size" => $requestAppointment["size"],
+            "sex" => $requestAppointment["sex"],
+            "category" => $requestAppointment["category"],
         ];
 
 //        if($request->hasFile('avatar')){
@@ -396,14 +390,14 @@ class AdminDashboardController extends Controller
 ////            $user->avatar = $fileName;
 ////        }
 //        $user->save();
-        return redirect()->route('admin.appointments')->with('success','Appointment updated successfully');
+        return redirect()->route('admin.appointments')->with('success','Product updated successfully');
     }
 
     public function deleteAppointment($id)
     {
-        $user = Appointment::withTrashed()->find($id);
+        $user = Product::find($id);
         $user->forceDelete();
-        return redirect()->route('admin.appointments')->with('success', 'Appointment deleted successfully');
+        return redirect()->route('admin.appointments')->with('success', 'Product deleted successfully');
     }
 
 

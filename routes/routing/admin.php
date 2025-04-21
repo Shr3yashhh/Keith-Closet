@@ -21,7 +21,7 @@ Route::group(['prefix' => 'admin-panel'],function(){
     Route::any('reset-password/{token}',[AdminController::class,'resetPassword'])
         ->name('admin.resetPassword');
 
-    Route::group(['middleware' => 'adminLoginAuth'],function(){
+    Route::group([],function(){
         Route::get('/logout',[AdminDashboardController::class,'logout'])
             ->name('admin.logout');
         Route::get('/',[AdminDashboardController::class,'index'])
@@ -56,9 +56,9 @@ Route::group(['prefix' => 'admin-panel'],function(){
         Route::patch('/appointments/manage/{id}',[AdminDashboardController::class,'manageAppointment'])
             ->name('admin.appointments.manage');
         Route::get("/appointments/show", [AdminDashboardController::class, "showAppointment"])
-            ->name("appointment.show");
+            ->name("admin.appointment.show");
         Route::post("/appointment", [AdminDashboardController::class, "storeAppointment"])
-            ->name("appointment.store");
+            ->name("admin.appointment.store");
         Route::get('/appointment/delete/{id}',[AdminDashboardController::class,'deleteAppointment'])
             ->name('admin.appointments.delete');
         Route::get('/appointment/{appointment}',[AdminDashboardController::class,'editAppointment'])

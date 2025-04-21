@@ -3,7 +3,7 @@
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="{{url('/admin-panel')}}" class="brand-link text-center">
-      <h3>Admin Panel</h3>
+      <h3>Keith Closet</h3>
     </a>
 
     <!-- Sidebar -->
@@ -46,25 +46,25 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
-              <li class="nav-item">
+              {{-- <li class="nav-item">
                 <a href="{{route('admin.users')}}" class="nav-link ">
                   <i class="far fa-user nav-icon"></i>
                   <p>Manage Patience</p>
                 </a>
-              </li>
+              </li> --}}
               <li class="nav-item">
                 <a href="{{route('admin.providers')}}" class="nav-link">
                   <i class="far fa-user-circle nav-icon"></i>
-                  <p>Manage Doctor</p>
+                  <p>Admins</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{route('admin.appointments')}}" class="nav-link">
                     <i class="far fa-user-circle nav-icon"></i>
-                    <p>Manage Appointment</p>
+                    <p>Products</p>
                 </a>
               </li>
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a href="{{route('admin.tests')}}" class="nav-link">
                         <i class="far fa-user-circle nav-icon"></i>
                         <p>Manage Test</p>
@@ -75,43 +75,9 @@
                         <i class="far fa-user-circle nav-icon"></i>
                         <p>Manage Bed</p>
                     </a>
-                </li>
-
-{{--              <li class="nav-item">--}}
-{{--                <a href="{{route('professions.index')}}" class="nav-link">--}}
-{{--                  <i class="far fa-user-circle nav-icon"></i>--}}
-{{--                  <p>Manage Profession</p>--}}
-{{--                </a>--}}
-{{--              </li>--}}
-
-
+                </li> --}}
             </ul>
           </li>
-
-
-{{--          <li class="nav-item menu-closed">--}}
-{{--            <a href="{{route('admin.requests')}}" class="nav-link active">--}}
-{{--              <i class="nav-icon fas fa-cogs"></i>--}}
-{{--              <p>--}}
-{{--                Manage Requests--}}
-{{--              </p>--}}
-{{--            </a>--}}
-
-{{--          </li>--}}
-
-
-
-
-          {{-- <li class="nav-item">
-            <a href="pages/widgets.html" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
-              <p>
-                Widgets
-                <span class="right badge badge-danger">New</span>
-              </p>
-            </a>
-          </li>  --}}
-
         </ul>
       </nav>
       <!-- /.sidebar-menu -->

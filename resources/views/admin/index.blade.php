@@ -6,7 +6,7 @@
                 <div class="card-header">
                     <h3>Admin Dashboard</h3>
                 </div>
-                <div class="card-body">
+                {{-- <div class="card-body">
                     <div class="row">
                         <div class="col-md-4">
                             <div class="card p-3">
@@ -29,7 +29,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>

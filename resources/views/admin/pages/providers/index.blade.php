@@ -2,12 +2,12 @@
 @section('content')
     <div class="d-flex justify-content-between">
         <div>
-            <h4 class="mt-2"><i class="fa fa-users mr-1 "></i> List of Doctors</h4>
+            <h4 class="mt-2"><i class="fa fa-users mr-1 "></i> List of Admin Users</h4>
         </div>
         <div class="mt-2">
             <a href="{{ route("admin.provider.show") }}">
                 <button class="btn-info">
-                    Add Doctor
+                    Add Admin
                 </button>
             </a>
         </div>

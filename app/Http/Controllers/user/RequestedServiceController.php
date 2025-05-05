@@ -112,7 +112,6 @@ class RequestedServiceController extends Controller
     public function showAppointment()
     {
         $doctors = User::whereRoleAndStatus("doctor", "active")->get();
-//        dd($doctors);
         return view("user.pages.appointments.create", [
             "doctors" => $doctors
         ]);
@@ -157,7 +156,6 @@ class RequestedServiceController extends Controller
             "description" => $requestAppointment["description"],
             "date" => $requestAppointment["date"],
         ];
-//        dd($updateData);
 
 //        if($request->hasFile('avatar')){
 //            $file = $request->file('avatar');

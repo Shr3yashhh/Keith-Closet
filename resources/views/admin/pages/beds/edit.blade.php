@@ -34,43 +34,35 @@
                     <form action="{{route('admin.beds.update',$bed->id)}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
-                            <label for="bed_number">Bed Number</label>
-                            <input required type="text" class="form-control" name="bed_number" value="{{ $bed->bed_number }}" placeholder="Enter Bed Number">
-                            @error('bed_number')
-                            <span class="text-danger">{{$message}}</span>
-
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="doctor">Doctor</label>
-                            <select required class="form-control" name="doctor" placeholder="Enter Name">
-                                @foreach($doctors as $doctor)
-                                    <option value="{{ $doctor->id }}">{{ $doctor->name }}</option>
-                                @endforeach
-                            </select>
+                            <label for="name">Name</label>
+                            <input required type="text" class="form-control" name="name" value="{{ $bed->name }}" placeholder="Enter Name">
                             @error('name')
                             <span class="text-danger">{{$message}}</span>
 
                             @enderror
                         </div>
                         <div class="form-group">
-                            <label for="user">User</label>
-                            <select required class="form-control" name="user" placeholder="Enter Name">
-                            @foreach($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('name')
+                            <label for="code">Code</label>
+                            <input required type="text" class="form-control" name="code" value="{{ $bed->code }}" placeholder="Enter Code">
+                            @error('code')
                             <span class="text-danger">{{$message}}</span>
 
                             @enderror
                         </div>
                         <div class="form-group">
-                            <label for="description">Comment</label>
-                            <textarea required class="form-control" name="comment" placeholder="Enter Comment"> {{ $bed->comment }}</textarea>
-
-                            @error('description')
+                            <label for="address">Address</label>
+                            <input required type="text" class="form-control" name="address" value="{{ $bed->address }}" placeholder="Enter Address">
+                            @error('address')
                             <span class="text-danger">{{$message}}</span>
+
+                            @enderror
+                        </div>
+                        <div class="form-group">
+                            <label for="contact_number">Contact Number</label>
+                            <input required type="text" class="form-control" name="contact_number" value="{{ $bed->contact_number }}" placeholder="Enter Contact Number">s
+                            @error('contact_number')
+                            <span class="text-danger">{{$message}}</span>
+
                             @enderror
                         </div>
 

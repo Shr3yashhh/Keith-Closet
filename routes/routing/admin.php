@@ -18,8 +18,10 @@ Route::group(['prefix' => 'admin-panel'],function(){
         ->name('admin.verify');
     Route::any('forgot-password',[AdminController::class,'forgotPassword'])
         ->name('admin.forgotPassword');
-    Route::any('reset-password/{token}',[AdminController::class,'resetPassword'])
+    Route::any('reset-password',[AdminController::class,'resetPassword'])
         ->name('admin.resetPassword');
+
+    // Route::get("reset-password", [AdminController::class, "resetPassword"])->name("admin.reset.password");
 
     Route::group([],function(){
         Route::get('/logout',[AdminDashboardController::class,'logout'])

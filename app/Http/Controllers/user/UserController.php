@@ -78,7 +78,6 @@ class UserController extends Controller
             'role' => 'required',
             'password' => 'required|min:6|max:16|confirmed'
         ]);
-//        dd($request->all());
         $data['name'] = $request->name;
         $data['email'] = $request->email;
         $data['password'] = Hash::make($request->password);

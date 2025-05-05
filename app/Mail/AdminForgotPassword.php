@@ -16,9 +16,8 @@ class AdminForgotPassword extends Mailable
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(protected array $detail)
     {
-       
     }
 
     /**
@@ -28,10 +27,11 @@ class AdminForgotPassword extends Mailable
      */
     public function build()
     {
-        
         $sub = "Admin Password reset link !";
         return $this->from('hms@gmail.com', 'KASP')
             ->subject($sub)
-            ->view('admin.login');
+            ->view('admin.forgot-password-mail',  [
+                'details' => $this->detail
+            ]);
     }
 }

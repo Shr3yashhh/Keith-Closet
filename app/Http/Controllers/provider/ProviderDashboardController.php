@@ -282,7 +282,6 @@ class ProviderDashboardController extends Controller
 
     public function updateUser(Request $request, $id)
     {
-//        dd($request);
 //        $requestUser = $request->validate([
 //            "name" => "required|string",
 //            "email" => "required|email",
@@ -292,8 +291,7 @@ class ProviderDashboardController extends Controller
 //        ]);
         $requestUser = $request->all();
         unset($requestUser["_token"]);
-//        dd($requestUser);
-//        dd($requestUser);
+
         $user = User::findOrFail($id);
 
 

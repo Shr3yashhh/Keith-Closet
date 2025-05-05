@@ -44,7 +44,8 @@
                         <div class="form-group">
                             <label for="name">Password</label>
                             <label for="password"></label><input type="password" class="form-control" id="password" name="password" placeholder="Enter Password" value="">
-                            @error('address')
+                            @error('password')
+                            {{-- @dd($message) --}}
                             <span class="text-danger">{{$message}}</span>
 
                             @enderror

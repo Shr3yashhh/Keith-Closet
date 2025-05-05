@@ -23,6 +23,7 @@ class AdminController extends Controller
         $this->validate($request, [
             'email' => 'required',
             'password' => 'required',
+            'g-recaptcha-response' => 'required|captcha'
         ]);
         if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
             if(Auth::user()->role == 'admin'){
@@ -63,7 +64,14 @@ class AdminController extends Controller
             'name' => 'required|min:3',
             'email' => 'required|email|unique:users,email',
             'role' => 'required',
-            'password' => 'required|min:6|max:16|confirmed'
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'max:16',
+                'confirmed',
+                'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$/'
+            ],
         ]);
         $data['name'] = $request->name;
         $data['email'] = $request->email;
@@ -153,15 +161,17 @@ class AdminController extends Controller
                 'email' => 'required|email',
             ]);
 
+
             $user = User::where('email',$request->email)->first();
             if(!$user){
                 return redirect()->back()->with('error','Email not found');
             }else{
                 $token = md5(microtime());
+                // $url = route('admin.resetPassword').'?token='.$token;
                 $details = [
                     'title' => 'Mail from HMS',
                     'body' => 'Please click the link below to reset your password',
-                    'link' => route('admin.resetPassword',$token)
+                    'link' => route('admin.resetPassword').'?token='.$token,
                 ];
 
                 Mail::to('test@gmail.com')->send(new \App\Mail\AdminForgotPassword($details));
@@ -176,6 +186,41 @@ class AdminController extends Controller
         }
 
     }
+
+    public function resetPassword(Request $request){
+        if($request->isMethod('get')){
+            $token = $request->query()["token"] ?? null;
+            $user = User::where('token',$token)->first();
+            if(!$user){
+                return redirect()->route('admin.login')->with('error','Token not found');
+            }else{
+                return view('admin.forgot-password-form', compact('token'));
+            }
+        }
+        if($request->isMethod('post')){
+            $request->validate([
+                'password' => [
+                    'required',
+                    'string',
+                    'min:8',
+                    'max:16',
+                    'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$/'
+                ],
+            ]);
+            $token = $request->query()["token"] ?? null;
+
+            $user = User::where('token',$token)->first();
+            if(!$user){
+                return redirect()->route('admin.login')->with('error','Token not found');
+            }else{
+                $user->password = Hash::make($request->password);
+                $user->token = null;
+                $user->save();
+                return redirect()->route('admin.login')->with('success','Password changed successfully');
+            }
+        }
+    }
+
     public function changePassword(Request $request,$id){
 
             if($request->isMethod('get')){
@@ -201,7 +246,6 @@ class AdminController extends Controller
         //request list of all users
         public function requestList($id, $hid = null){
             // hilight row logic
-            // dd($id, $hid);
             $hilight_id = $hid;
             if($hid != null){
                 $requested_service = RequestedService::find($hid);

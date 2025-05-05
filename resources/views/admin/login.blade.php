@@ -81,12 +81,17 @@
                                 <input type="password" name="password" class="form-control" />
                             </div>
 
-
+                            <div>
+                                {!! NoCaptcha::display() !!}
+                            </div>
 
                             <!-- Submit button -->
                             <button type="submit" class="btn btn-primary btn-block mb-4">
                                 Proceed to Login
                             </button>
+                            <p  class="">
+                                <a href="{{route("admin.forgotPassword")}}">Forgot Password?? <a>
+                            </p>
                             {{-- <div class="text-center">
                                 <small class="text-muted">
                                     Don't have an account? <a href="{{route('admins.create')}}">Sign up Now</a>
@@ -98,6 +103,9 @@
 
 
                         </form>
+
+
+
                     </div>
                 </div>
             </div>
@@ -109,7 +117,7 @@
     </section>
     <!-- Section: Design Block -->
 
-
+{!! NoCaptcha::renderJs() !!}
 </body>
 
 </html>

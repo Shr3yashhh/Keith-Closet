@@ -77,7 +77,6 @@ class FrontendController extends Controller
                             }
                
          }
-        //  dd($professions);
         return view('frontend.pages.homeSearch', compact('professions', 'search_options'));
         }else{
             $professions = User::join('professions', 'users.profession_id', '=', 'professions.id')
@@ -97,7 +96,6 @@ class FrontendController extends Controller
                 'provider_trackers.*'
             ]);
 
-        //    dd($professions);
             return view('frontend.pages.homeSearch', compact('professions', 'search_options'));
 
 

@@ -31,7 +31,6 @@ class UserDashboardController extends Controller
                 $user_notification_msg[$key]['time_ago'][$key] = strtotime($request_notification->created_at);
             }
         }
-        // dd($user_notification_msg);
         $request_count = RequestedService::where('user_id','=',Session::get('session_user')->id)->count();
         $request_count_today = RequestedService::whereDate('created_at', date('Y-m-d'))->where('user_id','=',Session::get('session_user')->id)->count();
         $request_count_month = RequestedService::whereMonth('created_at', date('m'))->where('user_id','=',Session::get('session_user')->id)->count();

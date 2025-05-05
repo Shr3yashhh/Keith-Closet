@@ -3,13 +3,13 @@
 
 <div class="d-flex justify-content-between">
     <div>
-        <h4 class="mt-2"><i class="fa fa-users mr-1 "></i> List of Bed</h4><br>
-        <h3>Number of beds: {{ count($beds) }}</h3>
+        <h4 class="mt-2"><i class="fa fa-users mr-1 "></i> List of Warehouse</h4><br>
+        <h3>Number of Warehouse: {{ count($beds) }}</h3>
     </div>
     <div class="mt-2">
         <a href="{{ route("admin.beds.show") }}">
             <button class="btn-info">
-                Add Test
+                Add Warehouse
             </button>
         </a>
     </div>
@@ -38,19 +38,19 @@
           <table class="table table-bordered table-hover">
         <tr>
           <th>SN</th>
-          <th>Bed Number</th>
-          <th>Patient Name</th>
-          <th>Doctor Name</th>
-          <th>Comment</th>
+          <th>Name</th>
+          <th>Code</th>
+          <th>Address</th>
+          <th>contact_number</th>
             <th>Action</th>
         </tr>
         @foreach ($beds as $key => $bed)
         <tr>
           <td>{{ ++$key }}</td>
-            <td>{{ $bed->bed_number }}</td>
-          <td>{{ $bed->patient->name }}</td>
-            <td>{{ $bed->doctor->name }}</td>
-            <td>{{ $bed->comment }}</td>
+          <td>{{ $bed->name }}</td>
+          <td>{{ $bed->code }}</td>
+          <td>{{ $bed->address }}</td>
+          <td>{{ $bed->contact_number }}</td>
 
 
 {{--            <td>--}}

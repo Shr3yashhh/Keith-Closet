@@ -11,7 +11,6 @@
         <link rel="stylesheet" href="{{url('plugins/fontawesome-free/css/all.min.css')}}">
         <link rel="stylesheet" href="{{url('plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css')}}">
 
-
     <section class="text-center text-lg-start">
 
         <style>
@@ -53,47 +52,57 @@
                             {{Session::get('success')}}
                         </div>
 
-                            
+
                         @endif
                         @if (Session::has('error'))
                         <div class="alert alert-danger">
                             {{Session::get('error')}}
                         </div>
-                            
+
                         @endif
                         <a href="{{url('/')}}" style="text-decoration: none;"><i class="fa fa-arrow-left" ></i> Goto Site</a> 
 
-                        <h2 class="fw-bold mb-5 text-center"><i class="fa fa-lock"></i> Patient Login </h2>
-                        <p id="status"></p>
-                        <form action="{{route('user.verify')}}" method="POST">
+                        <h2 class="fw-bold mb-5 text-center"><i class="fa fa-lock"></i> Admin Login </h2>
+
+                        <form action="{{route('admin.resetPassword', ["token" => request()->query()["token"]])}}" method="POST">
 
 
                             @csrf
-                            <input type="hidden" name="current_latitude" id="lat">
-                            <input type="hidden" name="current_longitude" id="lng">
                             <!-- Email input -->
-                            <div class="form-outline mb-4">
+                            {{-- <div class="form-outline mb-4">
                                 <label class="form-label">Email</label>
 
                                 <input type="text" name="email" class="form-control" />
-                            </div>
+                            </div> --}}
 
                             <!-- Password input -->
                             <div class="form-outline mb-4">
                                 <label class="form-label">Password</label>
 
                                 <input type="password" name="password" class="form-control" />
+                                @error('password')
+                                    <span class="text-danger">{{$message}}</span>
+
+                                @enderror
                             </div>
+
+
 
                             <!-- Submit button -->
                             <button type="submit" class="btn btn-primary btn-block mb-4">
-                                Proceed to Login
+                                Change password
                             </button>
-                            <div class="text-center">
+                            {{-- <p  class="">
+                                <a href="{{route("admin.forgotPassword")}}">Forgot Password?? <a>
+                            </p> --}}
+                            {{-- <div class="text-center">
                                 <small class="text-muted">
-                                    Don't have an account? <a href="{{route('users.create')}}">Sign up Now</a>
+                                    Don't have an account? <a href="{{route('admins.create')}}">Sign up Now</a>
+                                </small><br>
+                                <small class="text-muted">
+                                   <a href="{{route('admin.forgotPassword')}}">Forgot password?</a>
                                 </small>
-                            </div>
+                            </div> --}}
 
 
                         </form>
@@ -108,37 +117,7 @@
     </section>
     <!-- Section: Design Block -->
 
-    <script>
-    
-        window.onload = function() {
-            var status = document.getElementById('status');
-            var lat = document.getElementById('lat');
-            var lng = document.getElementById('lng');
-    
-            function success(position) {
-                const latitude = position.coords.latitude;
-                const longitude = position.coords.longitude;
-                status.textContent = '';
-                lat.value = latitude;
-                lng.value = longitude;
-                            
-            }
-    
-            function error() {
-                status.textContent = 'Unable to retrieve your location';
-            }
-    
-            if (!navigator.geolocation) {
-                status.textContent = 'Geolocation is not supported by your browser';
-            } else {
-                status.textContent = 'Locating your location…';
-                navigator.geolocation.getCurrentPosition(success, error);
-            }
-    
-        }
-        
-    </script>
-    
+
 </body>
 
 </html>

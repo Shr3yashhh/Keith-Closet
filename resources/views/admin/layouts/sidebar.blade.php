@@ -3,7 +3,9 @@
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="{{url('/admin-panel')}}" class="brand-link text-center">
-      <h3>Keith Closet</h3>
+      <a href="{{url('/')}}">
+        <img src="{{url('frontend/assets/img/keithlogo.png')}}" alt="" style="filter:invert(80%);max-height:90px" class="img-fluid"></a>
+      {{-- <h3>Keith Closet</h3> --}}
     </a>
 
     <!-- Sidebar -->
@@ -62,6 +64,12 @@
                 <a href="{{route('admin.appointments')}}" class="nav-link">
                     <i class="far fa-user-circle nav-icon"></i>
                     <p>Products</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{route('admin.beds')}}" class="nav-link">
+                    <i class="far fa-user-circle nav-icon"></i>
+                    <p>Warehouse</p>
                 </a>
               </li>
                 {{-- <li class="nav-item">

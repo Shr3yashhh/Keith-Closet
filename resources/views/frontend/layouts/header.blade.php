@@ -57,6 +57,12 @@
           <li><a href="{{url('/#services')}}">Services</a></li>
           <li><a href="{{url('/#services')}}">Donate</a></li>
           <li><a href="{{url('/#contact')}}">Contact Us</a></li>
+          @guest
+            <li><a href="{{ url('/admin-panel/login') }}">Login</a></li>
+          @else
+            <li><a href="{{ url('/admin-panel') }}">Dashboard</a></li>
+          @endguest
+          {{-- <li><a href="{{url('/admin-panel/login')}}">Login</a></li> --}}
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->

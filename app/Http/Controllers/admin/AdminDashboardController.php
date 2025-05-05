@@ -10,12 +10,14 @@ use App\Models\Profession;
 use App\Models\RequestedService;
 use App\Models\Test;
 use App\Models\User;
+use App\Models\Warehouse;
 use Barryvdh\DomPDF\PDF;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
-
+use Illuminate\Support\Facades\Validator;
 
 class AdminDashboardController extends Controller
 {
@@ -72,8 +74,9 @@ class AdminDashboardController extends Controller
 
     public function logout()
     {
-        Session::forget('session_admin');
-        return redirect()->route('admin.login')->with('success','Logout Successfully');
+        Auth::logout(); // This logs out the user from Laravel's auth
+        Session::flush(); // Optional: clears all session data
+        return redirect()->route('admin.login')->with('success', 'Logout Successfully');
     }
     public function listProviders()
     {
@@ -119,13 +122,48 @@ class AdminDashboardController extends Controller
 
     public function storeProvider(Request $request)
     {
-        $requestUser = $request->validate([
-            "name" => "required|string",
-            "email" => "required|email",
-            "phone" => "required|string",
-            "address" => "required|string",
-            "password" => "required|string",
+        // $requestUser = $request->validate([
+        //     "name" => "required|string",
+        //     "email" => "required|email",
+        //     "phone" => "required|string",
+        //     "address" => "required|string",
+        //     "password" => "required|string",
+        // ]);
+        // $requestUser = $request->validate([
+        //     'name' => 'required|min:3',
+        //     'email' => 'required|email|unique:users,email',
+        //     "phone" => "required|string",
+        //     "address" => "required|string",
+        //     'password' => [
+        //         'required',
+        //         'string',
+        //         'min:8',
+        //         'max:16',
+        //         'confirmed',
+        //         'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/'
+        //     ],
+        // ]);
+
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|min:3',
+            'email' => 'required|email|unique:users,email',
+            'phone' => 'required|string',
+            'address' => 'required|string',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'max:16',
+                'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/'
+            ],
+        ], [
+            'password.regex' => 'Password must include at least one uppercase letter, one number, and one special character.',
         ]);
+
+        $requestUser = $validator->validated();
+
+
         $requestUser["password"] = Hash::make($requestUser["password"]);
         $requestUser["role"] = "admin";
         $requestUser["status"] = "active";
@@ -263,7 +301,6 @@ class AdminDashboardController extends Controller
             "address" => "required|string",
             "password" => "required|string",
         ]);
-        dd($requestUser);
         $user = User::findOrFail($id);
 
 
@@ -523,10 +560,7 @@ class AdminDashboardController extends Controller
 
     public function listBeds()
     {
-        $tests = Bed::with([
-            "patient",
-            "doctor"
-        ])->get();
+        $tests = Warehouse::get();
 
         return view('admin.pages.beds.index',[
             "beds" => $tests,
@@ -535,7 +569,7 @@ class AdminDashboardController extends Controller
 
     public function manageBed(Request $request,$id)
     {
-        $appointments = Bed::findOrfail($id);
+        $appointments = Warehouse::findOrfail($id);
         if($request->has('status')){
             $appointments->status = $request->status;
             $appointments->save();
@@ -547,14 +581,14 @@ class AdminDashboardController extends Controller
     public function storeBed(Request $request)
     {
         $requestAppointment = $request->all();
-        $requestAppointment["status"] = "pending";
+        // $requestAppointment["status"] = "pending";
         $createData = [
-            "bed_number" => $requestAppointment["bed_number"],
-            "doctor_id" => $requestAppointment["doctor"],
-            "patient_id" => $requestAppointment["user"],
-            "comment" => $requestAppointment["comment"],
+            "name" => $requestAppointment["name"],
+            "code" => $requestAppointment["code"],
+            "address" => $requestAppointment["address"],
+            "contact_number" => $requestAppointment["contact_number"],
         ];
-        $user = Bed::insert($createData);
+        $user = Warehouse::insert($createData);
 
         return redirect()->route('admin.beds')->with('success','User created successfully');
     }
@@ -631,4 +665,36 @@ class AdminDashboardController extends Controller
     }
 
 
+    public function forgotPassword(Request $request){
+        if($request->isMethod('get')){
+            return view('admin.forgot-password');
+        }
+        if($request->isMethod('post')){
+            $request->validate([
+                'email' => 'required|email',
+            ]);
+
+            $user = User::where('email',$request->email)->first();
+            if(!$user){
+                return redirect()->back()->with('error','Email not found');
+            }else{
+                $token = md5(microtime());
+                $details = [
+                    'title' => 'Mail from HMS',
+                    'body' => 'Please click the link below to reset your password',
+                    'link' => route('admin.resetPassword',$token)
+                ];
+
+                Mail::to('test@gmail.com')->send(new \App\Mail\AdminForgotPassword($details));
+                if(Mail::failures()){
+                    return redirect()->back()->with('error','Something went wrong');
+                }else{
+                    $user->token = $token;
+                    $user->save();
+                    return redirect()->back()->with('success','Please check your email');
+                }
+            }
+        }
+
+    }
 }

@@ -52,13 +52,11 @@
                             {{Session::get('success')}}
                         </div>
 
-                            
                         @endif
                         @if (Session::has('error'))
                         <div class="alert alert-danger">
                             {{Session::get('error')}}
                         </div>
-                            
                         @endif
                         <a href="{{url('/')}}" style="text-decoration: none;"><i class="fa fa-arrow-left" ></i> Goto Site</a> 
                         <h2 class="fw-bold mb-5 text-center"> <i class="fa fa-lock"></i> Doctor Login </h2>
@@ -83,6 +81,7 @@
                                 <input type="password" name="password" class="form-control" />
                             </div>
 
+                            {!! NoCaptcha::display() !!}
 
 
                             <!-- Submit button -->
@@ -95,7 +94,7 @@
                                 </small>
                             </div>
 
-
+                            {!! NoCaptcha::renderJs() !!}
                         </form>
                     </div>
                 </div>

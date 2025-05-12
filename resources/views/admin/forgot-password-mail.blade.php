@@ -12,7 +12,7 @@
         <link rel="stylesheet" href="{{url('plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css')}}">
 
     <section class="text-center text-lg-start">
-
+`
         <style>
             .cascading-right {
                 margin-right: -50px;

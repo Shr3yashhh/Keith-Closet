@@ -18,10 +18,10 @@ class AdminLoginAuth
      */
     public function handle(Request $request, Closure $next)
     {
-        if(!Session::has('session_admin')){
+        $user = Auth::user() ?? null;
+        if(!Session::has('session_admin') || !$user) {
             return redirect()->route('admin.login')->with('error','Please login first');
         }
-        
         return $next($request);
     }
 }

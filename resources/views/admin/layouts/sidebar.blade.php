@@ -72,13 +72,13 @@
                     <p>Warehouse</p>
                 </a>
               </li>
-                {{-- <li class="nav-item">
+                <li class="nav-item">
                     <a href="{{route('admin.tests')}}" class="nav-link">
                         <i class="far fa-user-circle nav-icon"></i>
-                        <p>Manage Test</p>
+                        <p>Stock Management</p>
                     </a>
                 </li>
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a href="{{route('admin.beds')}}" class="nav-link">
                         <i class="far fa-user-circle nav-icon"></i>
                         <p>Manage Bed</p>

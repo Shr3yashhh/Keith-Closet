@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\Bed;
 use App\Models\Product;
+use App\Models\ProductWarehouse;
 use App\Models\Profession;
 use App\Models\RequestedService;
 use App\Models\Test;
@@ -18,6 +19,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Mail;
 
 class AdminDashboardController extends Controller
 {
@@ -439,18 +442,41 @@ class AdminDashboardController extends Controller
 
 
 
-//    Test
+    //    Test
 
-    public function listTests()
+    public function listTests(Request $request)
     {
-        $tests = Test::with([
-            "patient",
-        ])->get();
+        $query = ProductWarehouse::with(['warehouse', 'product']);
 
-        return view('admin.pages.tests.index',[
-            "tests" => $tests,
+        if ($request->filled('product_id')) {
+            $query->where('product_id', $request->input('product_id'));
+        }
+
+        if ($request->filled('warehouse_id')) {
+            $query->where('warehouse', $request->input('warehouse_id'));
+        }
+
+        $tests = $query->get();
+
+        $products = Product::all(); // For filter dropdown
+        $warehouses = Warehouse::all();
+
+        // dd([
+        //     'tests' => $tests,
+        //     'products' => $products,
+        //     'warehouses' => $warehouses,
+        //     'selectedProduct' => $request->product_id,
+        //     'selectedWarehouse' => $request->warehouse_id,
+        // ]);
+        return view('admin.pages.tests.index', [
+            'tests' => $tests,
+            'products' => $products,
+            'warehouses' => $warehouses,
+            'selectedProduct' => $request->product_id,
+            'selectedWarehouse' => $request->warehouse_id,
         ]);
     }
+
 
     public function manageTest(Request $request,$id)
     {
@@ -465,91 +491,110 @@ class AdminDashboardController extends Controller
 
     public function storeTest(Request $request)
     {
-        $requestAppointment = $request->all();
-        $requestAppointment["status"] = "pending";
-        $createData = [
-            "patient_id" => $requestAppointment["user"],
-            "name" => $requestAppointment["name"],
-            "comment" => $requestAppointment["comment"],
-        ];
-        $user = Test::insert($createData);
+        // $requestAppointment = $request->all();
+        // $requestAppointment["status"] = "pending";
+        // $validated = Validator::make($requestAppointment, [
+        //     'product' => ['required', 'integer', 'exists:products,id'],
+        //     'warehouse' => ['required', 'integer', 'exists:warehouses,id'],
+        //     'stock' => ['required', 'integer', 'min:1'],
+        // ])->validate();
 
-        return redirect()->route('admin.tests')->with('success','Test created successfully');
+        $requestAppointment = $request->validate([
+            'product' => ['required', 'integer', 'exists:products,id'],
+            'warehouse' => ['required', 'integer', 'exists:warehouses,id'],
+            'quantity' => ['required', 'integer', 'min:1'],
+            "bin_location" => ['nullable', 'string'],
+        ]);
+        // $requestUser = $validated->validated();
+        $createData = [
+            "product_id" => $requestAppointment["product"],
+            "warehouse_id" => $requestAppointment["warehouse"],
+            "quantity" => $requestAppointment["quantity"],
+            "bin_location" => $requestAppointment["bin_location"] ?? "",
+        ];
+
+        $existingStock = ProductWarehouse::where('product_id', $requestAppointment["product"])
+            ->where('warehouse_id', $requestAppointment["warehouse"])
+            ->first();
+
+        if ($existingStock) {
+            return redirect()->route('admin.tests.show')->with('exist','This product stock already exists in this warehouse');
+        }
+        $stock = ProductWarehouse::insert($createData);
+
+        return redirect()->route('admin.tests')->with('success','Stock created successfully');
     }
 
     public function showTest()
     {
-        $doctors = User::whereRoleAndStatus("doctor", "active")->get();
-        $users = User::whereRoleAndStatus("user", "active")->get();
+        $products = Product::get();
+        $warehouses = Warehouse::get();
+        $binLocation = config('bin_location');
+        $binLocations = Arr::first($binLocation);
+        // dd($binLocations);
         return view('admin.pages.tests.create', [
-            "doctors" => $doctors,
-            "users" => $users,
+            "products" => $products,
+            "warehouses" => $warehouses,
+            "binLocations" => $binLocation,
         ]);
     }
 
     public function editTest($id)
     {
-        $test = Test::with("patient")->findOrFail($id);
-        $users = User::whereRoleAndStatus("user", "active")->get();
+        $test = ProductWarehouse::with(["warehouse","product"])->findOrFail($id);
+        $products = Product::get();
+        $warehouses = Warehouse::get();
+        $binLocation = config('bin_location');
+        // $users = User::whereRoleAndStatus("user", "active")->get();
         return view('admin.pages.tests.edit',[
             'test' => $test,
-            "users" => $users,
+            "products" => $products,
+            "warehouses" => $warehouses,
+            "binLocations" => $binLocation,
+            // "users" => $users,
         ]);
     }
 
     public function updateTest(Request $request, $id)
     {
-//        $requestUser = $request->validate([
-//            "name" => "required|string",
-//            "email" => "required|email",
-//            "phone" => "required|string",
-//            "address" => "required|string",
-//            "password" => "required|string",
-//        ]);
-        $requestAppointment = $request->all();
-        $appointment = Test::findOrFail($id);
-        $updateData = [
-            "name" => $requestAppointment["name"],
-            "patient_id" => $requestAppointment["user"],
-            "comment" => $requestAppointment["comment"],
+        $requestAppointment = $request->validate([
+            'product' => ['required', 'integer', 'exists:products,id'],
+            'warehouse' => ['required', 'integer', 'exists:warehouses,id'],
+            'quantity' => ['required', 'integer', 'min:1'],
+            "bin_location" => ['nullable', 'string'],
+        ]);
+        // $requestUser = $validated->validated();
+        $createData = [
+            "product_id" => $requestAppointment["product"],
+            "warehouse_id" => $requestAppointment["warehouse"] ?? "",
+            "quantity" => $requestAppointment["quantity"] ?? "",
+            "bin_location" => $requestAppointment["bin_location"] ?? "",
         ];
 
-//        if($request->hasFile('avatar')){
-//            $file = $request->file('avatar');
-//            $fileName = md5(microtime()).'_'.$file->getClientOriginalName();
-//            $file->move(public_path('profession_avatar'),$fileName);
-//            if($user->avatar != null){
-//                $old_avatar = $user->avatar;
-//                if(file_exists(public_path('profession_avatar/'.$old_avatar))){
-//                    unlink(public_path('profession_avatar/'.$old_avatar));
-//                }
-//            }
-//
-//        }
-        $appointment->update($updateData);
-//        $user->email = $requestUser->email;
-//
-//        $user->meta_description = $requestUser->phone_number;
-//        $user->description = $requestUser->address;
-////        if($request->hasFile('avatar')){
-////            $user->avatar = $fileName;
-////        }
-//        $user->save();
-        return redirect()->route('admin.tests')->with('success','Appointment updated successfully');
+        $existingStock = ProductWarehouse::where('product_id', $requestAppointment["product"])
+            ->where('warehouse_id', $requestAppointment["warehouse"])
+            ->first();
+
+        if ($existingStock && $existingStock->id != $id) {
+            return redirect()->back()->with('exist','This product stock already exists in this warehouse');
+        }
+        $stock = ProductWarehouse::findOrFail($id);
+        $stock = $stock->update($createData);
+
+        return redirect()->route('admin.tests')->with('success','Stock update successfully');
     }
 
     public function deleteTest($id)
     {
-        $user = Test::withTrashed()->find($id);
+        $user = ProductWarehouse::find($id);
         $user->forceDelete();
-        return redirect()->route('admin.appointments')->with('success', 'Appointment deleted successfully');
+        return redirect()->route('admin.appointments')->with('success', 'Stock deleted successfully');
     }
 
     public function generateTestPdf($id)
     {
-        $test = Test::with("patient")->findOrFail($id);
-
-        $pdf =$this->pdf->loadView("provider.pages.tests.report", ["data" => $test]);
+      
+        $pdf = $this->pdf->loadView("provider.pages.tests.report", ["data" => $test]);
 
         return $pdf->download("report");
     }

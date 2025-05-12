@@ -14,6 +14,7 @@ class ProductWarehouse extends Model
         'warehouse_id',
         'product_id',
         'quantity',
+        'bin_location',
     ];
 
     public function warehouse(): BelongsTo

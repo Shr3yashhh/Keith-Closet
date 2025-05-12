@@ -135,6 +135,27 @@ Route::group(['prefix' => 'admin-panel'],function(){
             ->name('admin.beds.manage');
 
 
+        // orders
+        // Bed Route
+        Route::get('/orders',[AdminDashboardController::class,'listOrders'])
+            ->name('admin.orders');
+        Route::get('/orders/show',[AdminDashboardController::class,'showOrder'])
+            ->name('admin.orders.show');
+        Route::post('/orders',[AdminDashboardController::class,'storeOrder'])
+            ->name('admin.orders.store');
+        Route::get('/orders/{orders}',[AdminDashboardController::class,'editOrder'])
+            ->name('admin.orders.edit');
+        Route::post('/orders/{orders}',[AdminDashboardController::class,'updateOrder'])
+            ->name('admin.orders.update');
+        Route::get('/orders/soft_delete/{id}',[AdminDashboardController::class,'softDeleteOrder'])
+            ->name('admin.orders.soft_delete');
+        Route::get('/orders/restore/{id}',[AdminDashboardController::class,'restoreOrder'])
+            ->name('admin.orders.restore');
+        Route::get('/orders/delete/{id}',[AdminDashboardController::class,'deleteOrder'])
+            ->name('admin.orders.delete');
+        Route::patch('/orders/manage/{id}',[AdminDashboardController::class,'manageOrder'])
+            ->name('admin.orders.manage');
+
 
         // Profession Route Start
         Route::resource('professions',ProfessionController::class);

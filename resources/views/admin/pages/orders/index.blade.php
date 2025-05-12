@@ -4,12 +4,12 @@
 
 <div class="d-flex justify-content-between">
     <div>
-        <h4 class="mt-2"><i class="fa fa-users mr-1 "></i> List of Appointment</h4>
+        <h4 class="mt-2"><i class="fa fa-users mr-1 "></i> List of Orders</h4>
     </div>
     <div class="mt-2">
-        <a href="/provider-panel/providers">
+        <a href="{{ route('admin.orders.show') }}">
             <button class="btn-info">
-                Add Appointment
+                Add Orders
             </button>
         </a>
     </div>
@@ -33,27 +33,28 @@
   <div class="tab-content" id="nav-tabContent">
     <div class="tab-pane fade  show active" id="nav-active" role="tabpanel" aria-labelledby="nav-home-tab">
 
-      @if ($medicines)
+      @if ($orders->count() > 0)
 
           <table class="table table-bordered table-hover">
         <tr>
           <th>SN</th>
-            <th>Name</th>
-            <th>Patient Name</th>
-          <th>Doctor Name</th>
+            <th>Sender Warehouse</th>
+            <th>Receiver Warehouse</th>
+          <th>Quantity</th>
+          <th>status</th>
             <th>Action</th>
         </tr>
-        @foreach ($medicines as $key => $medicine)
+        @foreach ($orders as $key => $order)
         <tr>
-{{--            @dd($medicine)--}}
           <td>{{ ++$key }}</td>
-            <td>{{ $medicine->name }}</td>
-            <td>{{ $medicine->patient->name }}</td>
-          <td>{{ $medicine->doctor->name }}</td>
+            <td>{{ $order->senderWarehouse->name }}</td>
+            <td>{{ $order->receiverWarehouse->name }}</td>
+          <td>{{ $order->quantity }}</td>
+          <td>{{ $order->status }}</td>
 
 
           <td>
-            <a onclick="return confirm('Are you sure?')" href="{{ route('admin.users.soft_delete', $medicine->id) }}" class="btn btn-danger btn-sm">Delete</a>
+            {{-- <a onclick="return confirm('Are you sure?')" href="{{ route('admin.users.soft_delete', $order->id) }}" class="btn btn-danger btn-sm">Delete</a> --}}
           </td>
         </tr>
         @endforeach

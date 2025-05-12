@@ -78,12 +78,12 @@
                         <p>Stock Management</p>
                     </a>
                 </li>
-                {{-- <li class="nav-item">
-                    <a href="{{route('admin.beds')}}" class="nav-link">
+                <li class="nav-item">
+                    <a href="{{route('admin.orders')}}" class="nav-link">
                         <i class="far fa-user-circle nav-icon"></i>
-                        <p>Manage Bed</p>
+                        <p>Orders</p>
                     </a>
-                </li> --}}
+                </li>
             </ul>
           </li>
         </ul>

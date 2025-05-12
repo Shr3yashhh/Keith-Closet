@@ -5,6 +5,8 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\Bed;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductWarehouse;
 use App\Models\Profession;
@@ -13,6 +15,7 @@ use App\Models\Test;
 use App\Models\User;
 use App\Models\Warehouse;
 use Barryvdh\DomPDF\PDF;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -707,6 +710,144 @@ class AdminDashboardController extends Controller
         $user = Bed::withTrashed()->find($id);
         $user->forceDelete();
         return redirect()->route('admin.beds')->with('success', 'Appointment deleted successfully');
+    }
+
+
+
+
+
+    // orders
+
+    public function listOrders()
+    {
+        $tests = Order::with(["senderWarehouse", "receiverWarehouse"])->get();
+
+        return view('admin.pages.orders.index',[
+            "orders" => $tests,
+        ]);
+    }
+
+    public function manageOrder(Request $request,$id)
+    {
+        $appointments = Warehouse::findOrfail($id);
+        if($request->has('status')){
+            $appointments->status = $request->status;
+            $appointments->save();
+            return redirect()->route('admin.appointments')->with('success','User status updated successfully');
+        }
+        return redirect()->route('admin.orders')->with('error','Something went wrong');
+    }
+
+    public function storeOrder(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $requestAppointment = $request->all();
+
+            $totalQuantity =  array_reduce($requestAppointment["items"], function ($carry, $item) {
+                return $carry + (int) $item['quantity'];
+            }, 0);
+            $createData = [
+                "sender_warehouse_id" => $requestAppointment["from_warehouse_id"],
+                "receiver_warehouse_id" => $requestAppointment["to_warehouse_id"],
+                "user_id" => auth()->user()->id,
+                "quantity" => $totalQuantity,
+                // "address" => $requestAppointment["address"],
+                // "contact_number" => $requestAppointment["contact_number"],
+                "status" => "pending",
+            ];
+            // dd($createData);
+            $order = Order::create($createData);
+            // dd($order);
+
+            foreach ($requestAppointment["items"] as $item) {
+                OrderItem::create([
+                    "order_id" => $order->id,
+                    "product_id" => $item['product_id'],
+                    "quantity" => $item['quantity'],
+                ]);
+                // dd($test);
+                // $order->products()->attach($item['product_id'], ['quantity' => $item['quantity']]);
+            }
+        } catch (Exception $e) {
+            DB::rollBack();
+            return redirect()->route('admin.orders')->with('error', 'Something went wrong: ' . $e->getMessage());
+        }
+
+        DB::commit();
+        return redirect()->route('admin.orders')->with('success','Order created successfully');
+    }
+
+    public function showOrder()
+    {
+        $products = Product::get();
+        $warehouses = Warehouse::get();
+        return view('admin.pages.orders.create', [
+            "products" => $products,
+            "warehouses" => $warehouses,
+        ]);
+    }
+
+    public function editOrder($id)
+    {
+        $appointment = Bed::with("patient", "doctor")->findOrFail($id);
+        $doctors = User::whereRoleAndStatus("doctor", "active")->get();
+        $users = User::whereRoleAndStatus("user", "active")->get();
+        return view('admin.pages.orders.edit',[
+            'bed' => $appointment,
+            "doctors" => $doctors,
+            "users" => $users,
+        ]);
+    }
+
+    public function updateOrder(Request $request, $id)
+    {
+//        $requestUser = $request->validate([
+//            "name" => "required|string",
+//            "email" => "required|email",
+//            "phone" => "required|string",
+//            "address" => "required|string",
+//            "password" => "required|string",
+//        ]);
+        $requestAppointment = $request->all();
+        $appointment = Bed::findOrFail($id);
+        $updateData = [
+            "bed_number" => $requestAppointment["bed_number"],
+            "doctor_id" => $requestAppointment["doctor"],
+            "patient_id" => $requestAppointment["user"],
+            "comment" => $requestAppointment["comment"],
+        ];
+
+//        if($request->hasFile('avatar')){
+//            $file = $request->file('avatar');
+//            $fileName = md5(microtime()).'_'.$file->getClientOriginalName();
+//            $file->move(public_path('profession_avatar'),$fileName);
+//            if($user->avatar != null){
+//                $old_avatar = $user->avatar;
+//                if(file_exists(public_path('profession_avatar/'.$old_avatar))){
+//                    unlink(public_path('profession_avatar/'.$old_avatar));
+//                }
+//            }
+//
+//        }
+        $appointment->update($updateData);
+//        $user->email = $requestUser->email;
+//
+//        $user->meta_description = $requestUser->phone_number;
+//        $user->description = $requestUser->address;
+////        if($request->hasFile('avatar')){
+////            $user->avatar = $fileName;
+////        }
+//        $user->save();
+        return redirect()->route('admin.orders')->with('success','Appointment updated successfully');
+    }
+
+    public function deleteOrder($id)
+    {
+        $user = Bed::withTrashed()->find($id);
+        $user->forceDelete();
+        return redirect()->route('admin.orders')->with('success', 'Appointment deleted successfully');
     }
 
 

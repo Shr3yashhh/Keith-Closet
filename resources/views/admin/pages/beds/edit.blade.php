@@ -59,7 +59,7 @@
                         </div>
                         <div class="form-group">
                             <label for="contact_number">Contact Number</label>
-                            <input required type="text" class="form-control" name="contact_number" value="{{ $bed->contact_number }}" placeholder="Enter Contact Number">s
+                            <input required type="text" class="form-control" name="contact_number" value="{{ $bed->contact_number }}" placeholder="Enter Contact Number">
                             @error('contact_number')
                             <span class="text-danger">{{$message}}</span>
 

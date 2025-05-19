@@ -653,13 +653,11 @@ class AdminDashboardController extends Controller
 
     public function editBed($id)
     {
-        $appointment = Bed::with("patient", "doctor")->findOrFail($id);
-        $doctors = User::whereRoleAndStatus("doctor", "active")->get();
-        $users = User::whereRoleAndStatus("user", "active")->get();
+        $appointment = Warehouse::findOrFail($id);
+        // $doctors = User::whereRoleAndStatus("doctor", "active")->get();
+        // $users = User::whereRoleAndStatus("user", "active")->get();
         return view('admin.pages.beds.edit',[
             'bed' => $appointment,
-            "doctors" => $doctors,
-            "users" => $users,
         ]);
     }
 
@@ -673,12 +671,12 @@ class AdminDashboardController extends Controller
 //            "password" => "required|string",
 //        ]);
         $requestAppointment = $request->all();
-        $appointment = Bed::findOrFail($id);
+        $appointment = Warehouse::findOrFail($id);
         $updateData = [
-            "bed_number" => $requestAppointment["bed_number"],
-            "doctor_id" => $requestAppointment["doctor"],
-            "patient_id" => $requestAppointment["user"],
-            "comment" => $requestAppointment["comment"],
+            "name" => $requestAppointment["name"],
+            "code" => $requestAppointment["code"],
+            "address" => $requestAppointment["address"],
+            "contact_number" => $requestAppointment["contact_number"],
         ];
 
 //        if($request->hasFile('avatar')){
@@ -707,7 +705,7 @@ class AdminDashboardController extends Controller
 
     public function deleteBed($id)
     {
-        $user = Bed::withTrashed()->find($id);
+        $user = Warehouse::find($id);
         $user->forceDelete();
         return redirect()->route('admin.beds')->with('success', 'Appointment deleted successfully');
     }

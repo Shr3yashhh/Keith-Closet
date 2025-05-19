@@ -28,7 +28,8 @@
          <div class="col-md-12">
              <div class="card">
                  <div class="card-header">
-                     <h3 class="card-title"> <i class="fas fa-edit mr-2"></i><b>Edit Professions</b> </h3><a href="{{route('professions.index')}}" class="btn btn-sm btn-info " style="float: right !important;"> <i class="fas fa-eye mr-1"></i> View Profession</a>
+                     <h3 class="card-title"> <i class="fas fa-edit mr-2"></i><b>Edit Warehouse</b> 
+                    {{-- </h3><a href="{{route('professions.index')}}" class="btn btn-sm btn-info " style="float: right !important;"> <i class="fas fa-eye mr-1"></i> View Profession</a> --}}
                  </div>
                  <div class="card-body">
                     <form action="{{route('admin.beds.update',$bed->id)}}" method="POST" enctype="multipart/form-data">

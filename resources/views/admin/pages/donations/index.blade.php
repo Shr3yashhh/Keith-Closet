@@ -68,7 +68,7 @@
 
           <td>
             <a href="{{ route("admin.donations.edit", $order->id) }}" class="btn btn-sm btn-info"> <i class="fas fa-eye mr-1"></i> View</a>
-            <a onclick="return confirm('Are you sure?')" href="{{ route('admin.orders.delete', $order->id) }}" class="btn btn-danger btn-sm">Delete</a>
+            <a onclick="return confirm('Are you sure?')" href="{{ route('admin.donations.delete', $order->id) }}" class="btn btn-danger btn-sm">Delete</a>
           </td>
         </tr>
         @endforeach

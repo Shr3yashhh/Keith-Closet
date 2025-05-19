@@ -175,7 +175,7 @@ Route::group(['prefix' => 'admin-panel'],function(){
             ->name('admin.donations.soft_delete');
         Route::get('/donations/restore/{id}',[AdminDashboardController::class,'restoreOrder'])
             ->name('admin.donations.restore');
-        Route::get('/donations/delete/{id}',[AdminDashboardController::class,'deleteOrder'])
+        Route::get('/donations/delete/{id}',[AdminDashboardController::class,'deleteDonation'])
             ->name('admin.donations.delete');
         Route::patch('/donations/manage/{id}',[AdminDashboardController::class,'manageOrder'])
             ->name('admin.donations.manage');

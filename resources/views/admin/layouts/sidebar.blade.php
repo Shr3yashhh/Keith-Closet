@@ -84,6 +84,12 @@
                         <p>Orders</p>
                     </a>
                 </li>
+                <li class="nav-item">
+                  <a href="{{route('admin.donations')}}" class="nav-link">
+                      <i class="far fa-user-circle nav-icon"></i>
+                      <p>Donation</p>
+                  </a>
+              </li>
             </ul>
           </li>
         </ul>

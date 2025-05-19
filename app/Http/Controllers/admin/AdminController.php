@@ -33,12 +33,34 @@ class AdminController extends Controller
                 return redirect()->route('admin.login')->with('error', 'You are not an admin');
             }
         }else{
+            $user = User::where('email', $request->email)->first();
+            if($user){
+                if ($user->login_attempt >= 5) {
+                    Mail::to($user->email)->send(new \App\Mail\ResetLoginAttemptMail($user));
+                    return redirect()->route('admin.login')->with('error','Your account is locked. Please check your email to reset your login attempts.');
+                }
+                $user->login_attempt = $user->login_attempt + 1;
+                $user->save();
+            }
             return redirect()->route('admin.login')->with('error','Invalid Credentials');
         }
     }
     public function index()
     {
         //
+    }
+
+    public function resetLoginAttempt(Request $request)
+    {
+        $email = $request->query('email');
+        $user = User::where('email', $email)->first();
+        if ($user) {
+            $user->login_attempt = 0;
+            $user->save();
+            return redirect()->route('admin.login')->with('success','You can login again');
+        } else {
+            return redirect()->route('admin.login')->with('error','User not found');
+        }
     }
 
     /**

@@ -2,6 +2,7 @@
 @section('content')
 @if (Session::has('error'))
 <div class="alert alert-danger">
+    {{-- @dd(Session::get("error")) --}}
     {{ Session::get('error') }}
 </div>
 @endif
@@ -9,43 +10,18 @@
          <div class="col-md-12">
              <div class="card">
                  <div class="card-header">
-                     <h3 class="card-title"> <i class="fas fa-plus mr-2"></i><b>Add New Order</b> </h3>
+                     <h3 class="card-title"> <i class="fas fa-plus mr-2"></i><b>Add New Donation</b> </h3>
                  </div>
                  <div class="card-body">
-                    <form action="{{route('admin.orders.store')}}" method="POST" enctype="multipart/form-data">
+                    <form action="{{route('admin.donations.store')}}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        {{-- <div class="form-group">
+                        <div class="form-group">
                             <label for="name">Name</label>
                             <input type="text" class="form-control" id="name" name="name" placeholder="Enter Name">
                             @error('name')
                                 <span class="text-danger">{{$message}}</span>
-                                
                             @enderror
                         </div>
-                        <div class="form-group">
-                            <label for="avatar">Avatar</label>
-                            <input type="file" class="form-control"  name="avatar" onchange="previewImg(this,'#avatar_img');" > 
-                            @error('avatar')
-                                <span class="text-danger">{{$message}}</span>
-                                
-                            @enderror 
-                            <img style="width:200px;" class="img-fluid prev_img mt-2" id="avatar_img" src="#" alt="your image" />                        </div>
-                        <div class="form-group">
-                            <label for="status">Meta Description</label>
-                            <textarea class="form-control" id="ck_meta_description" name="meta_description" placeholder="Enter Meta Description"></textarea>
-                            @error('meta_description')
-                                <span class="text-danger">{{$message}}</span>
-
-                            @enderror
-                        </div>
-                        <div class="form-group">
-                            <label for="status">Description</label>
-                            <textarea class="form-control" id="ck_description" name="description" placeholder="Enter Meta Description"></textarea>
-
-                            @error('description')
-                                <span class="text-danger">{{$message}}</span>
-                            @enderror
-                        </div> --}}
 
 
                         <div class="form-group">
@@ -58,7 +34,7 @@
                             </select>
                         </div>
 
-                        <div class="form-group mt-3">
+                        {{-- <div class="form-group mt-3">
                             <label for="to_warehouse_id">To Warehouse</label>
                             <select name="to_warehouse_id" class="form-control" required>
                                 <option value="">Select Warehouse</option>
@@ -66,7 +42,7 @@
                                     <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                                 @endforeach
                             </select>
-                        </div>
+                        </div> --}}
 
 
 
@@ -105,27 +81,6 @@
         </div>
         <!-- end row -->
 
-        <script type="text/javascript">
-            $(document).ready(function(){
-             $('#avatar_img').hide();
-            })
-            function previewImg(input,id) {
-              if (input.files && input.files[0]) {
-                // document.querySelectorAll('.prev_img').style.display="block";
-                $(document).ready(function(){
-                  $(id).show();
-                })
-                  var reader = new FileReader();
-
-                  reader.onload = function (e) {
-                      $(id).attr('src', e.target.result);
-                  }
-
-                  reader.readAsDataURL(input.files[0]);
-              }
-          }
-        </script>
-
     <script>
         let productIndex = 1;
 
@@ -144,7 +99,7 @@
                     <input type="number" name="items[${productIndex}][quantity]" class="form-control" placeholder="Quantity" min="1" required>
                 </div>
                 <div class="col-md-2">
-                    <button type="button" class="btn btn-danger remove-product">X</button>
+                    <button type="button" class="btn btn-danger remove-product">Clear</button>
                 </div>
             </div>
             `;
@@ -162,30 +117,30 @@
         const fromSelect = document.querySelector('select[name="from_warehouse_id"]');
         const toSelect = document.querySelector('select[name="to_warehouse_id"]');
 
-        function disableSameWarehouse() {
-            const fromValue = fromSelect.value;
+        // function disableSameWarehouse() {
+        //     const fromValue = fromSelect.value;
 
-            [...toSelect.options].forEach(option => {
-                option.disabled = option.value === fromValue && fromValue !== '';
-            });
-        }
+        //     [...toSelect.options].forEach(option => {
+        //         option.disabled = option.value === fromValue && fromValue !== '';
+        //     });
+        // }
 
-        function disableSameWarehouseReverse() {
-            const toValue = toSelect.value;
+        // function disableSameWarehouseReverse() {
+        //     const toValue = toSelect.value;
 
-            [...fromSelect.options].forEach(option => {
-                option.disabled = option.value === toValue && toValue !== '';
-            });
-        }
+        //     [...fromSelect.options].forEach(option => {
+        //         option.disabled = option.value === toValue && toValue !== '';
+        //     });
+        // }
 
-        fromSelect.addEventListener('change', () => {
-            disableSameWarehouse();
-            disableSameWarehouseReverse();
-        });
+        // fromSelect.addEventListener('change', () => {
+        //     disableSameWarehouse();
+        //     disableSameWarehouseReverse();
+        // });
 
-        toSelect.addEventListener('change', () => {
-            disableSameWarehouse();
-            disableSameWarehouseReverse();
-        });
+        // toSelect.addEventListener('change', () => {
+        //     disableSameWarehouse();
+        //     disableSameWarehouseReverse();
+        // });
     </script>
 @endsection

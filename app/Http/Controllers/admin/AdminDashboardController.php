@@ -594,13 +594,13 @@ class AdminDashboardController extends Controller
         return redirect()->route('admin.appointments')->with('success', 'Stock deleted successfully');
     }
 
-    public function generateTestPdf($id)
-    {
+    // public function generateTestPdf($id)
+    // {
       
-        $pdf = $this->pdf->loadView("provider.pages.tests.report", ["data" => $test]);
+    //     $pdf = $this->pdf->loadView("provider.pages.tests.report", ["data" => $test]);
 
-        return $pdf->download("report");
-    }
+    //     return $pdf->download("report");
+    // }
 
 
 
@@ -720,7 +720,9 @@ class AdminDashboardController extends Controller
 
     public function listOrders()
     {
-        $tests = Order::with(["senderWarehouse", "receiverWarehouse"])->get();
+        $tests = Order::with(["senderWarehouse", "receiverWarehouse"])
+            ->where("type", null)
+            ->orWhere("type", "order")->get();
 
         return view('admin.pages.orders.index',[
             "orders" => $tests,
@@ -745,39 +747,81 @@ class AdminDashboardController extends Controller
         try {
             $requestAppointment = $request->all();
 
-            $totalQuantity =  array_reduce($requestAppointment["items"], function ($carry, $item) {
+            $requestAppointment = $request->validate([
+                'from_warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
+                'to_warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
+                'items' => ['required', 'array'],
+                'items.*.product_id' => ['required', 'integer', 'exists:products,id'],
+                'items.*.quantity' => ['required', 'integer', 'min:1'],
+            ]);
+
+            // Calculate total quantity
+            $totalQuantity = array_reduce($requestAppointment["items"], function ($carry, $item) {
                 return $carry + (int) $item['quantity'];
             }, 0);
+
+            // Stock availability check (BEFORE creating the order)
+            foreach ($requestAppointment["items"] as $item) {
+                $productWarehouseFrom = ProductWarehouse::where('product_id', $item['product_id'])
+                    ->where('warehouse_id', $requestAppointment["from_warehouse_id"])
+                    ->first();
+
+                if (!$productWarehouseFrom || $productWarehouseFrom->quantity < $item['quantity']) {
+                    throw new \Exception("Insufficient stock for product ID {$item['product_id']} in sender warehouse.");
+                }
+            }
+
+            // Create the order
             $createData = [
                 "sender_warehouse_id" => $requestAppointment["from_warehouse_id"],
                 "receiver_warehouse_id" => $requestAppointment["to_warehouse_id"],
                 "user_id" => auth()->user()->id,
                 "quantity" => $totalQuantity,
-                // "address" => $requestAppointment["address"],
-                // "contact_number" => $requestAppointment["contact_number"],
-                "status" => "pending",
+                "status" => "processing",
             ];
-            // dd($createData);
-            $order = Order::create($createData);
-            // dd($order);
 
+            $order = Order::create($createData);
+
+            // Handle inventory transfers
             foreach ($requestAppointment["items"] as $item) {
+                // Reduce stock from sender
+                $productWarehouseFrom = ProductWarehouse::where('product_id', $item['product_id'])
+                    ->where('warehouse_id', $requestAppointment["from_warehouse_id"])
+                    ->first();
+                $productWarehouseFrom->decrement('quantity', $item['quantity']);
+
+                // Add stock to receiver
+                $productWarehouseTo = ProductWarehouse::where('product_id', $item['product_id'])
+                    ->where('warehouse_id', $requestAppointment["to_warehouse_id"])
+                    ->first();
+
+                if ($productWarehouseTo) {
+                    $productWarehouseTo->increment('quantity', $item['quantity']);
+                } else {
+                    ProductWarehouse::create([
+                        'product_id' => $item['product_id'],
+                        'warehouse_id' => $requestAppointment["to_warehouse_id"],
+                        'quantity' => $item['quantity'],
+                    ]);
+                }
+
+                // Create order item
                 OrderItem::create([
                     "order_id" => $order->id,
                     "product_id" => $item['product_id'],
                     "quantity" => $item['quantity'],
                 ]);
-                // dd($test);
-                // $order->products()->attach($item['product_id'], ['quantity' => $item['quantity']]);
             }
-        } catch (Exception $e) {
-            DB::rollBack();
-            return redirect()->route('admin.orders')->with('error', 'Something went wrong: ' . $e->getMessage());
-        }
 
-        DB::commit();
-        return redirect()->route('admin.orders')->with('success','Order created successfully');
+            DB::commit();
+            return redirect()->route('admin.orders')->with('success', 'Order created successfully');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('error', 'Error: ' . $e->getMessage());
+        }
     }
+
 
     public function showOrder()
     {
@@ -791,63 +835,241 @@ class AdminDashboardController extends Controller
 
     public function editOrder($id)
     {
-        $appointment = Bed::with("patient", "doctor")->findOrFail($id);
-        $doctors = User::whereRoleAndStatus("doctor", "active")->get();
-        $users = User::whereRoleAndStatus("user", "active")->get();
+        $order = Order::with("senderWarehouse", "receiverWarehouse", "orderItems.product")->findOrFail($id);
+        // $appointment = Bed::with("patient", "doctor")->findOrFail($id);
+        // $doctors = User::whereRoleAndStatus("doctor", "active")->get();
+        // $users = User::whereRoleAndStatus("user", "active")->get();
         return view('admin.pages.orders.edit',[
-            'bed' => $appointment,
-            "doctors" => $doctors,
-            "users" => $users,
+            "order" => $order,
         ]);
     }
 
     public function updateOrder(Request $request, $id)
     {
-//        $requestUser = $request->validate([
-//            "name" => "required|string",
-//            "email" => "required|email",
-//            "phone" => "required|string",
-//            "address" => "required|string",
-//            "password" => "required|string",
-//        ]);
-        $requestAppointment = $request->all();
-        $appointment = Bed::findOrFail($id);
+       $requestUser = $request->validate([
+           "status" => "required|string",
+       ]);
+        $requestOrder = $request->all();
+        $order = Order::with("orderItems")->findOrFail($id);
+
+        if (!$this->canChangeOrderStatus($order->status, $requestOrder["status"])) {
+            return redirect()->back()->with('error', 'You cannot change the order status back to previous status.');
+        }
+
+        // Only process stock reversal if changing to "cancelled" from a different status
+        if ($requestOrder["status"] === 'cancelled' && $order->status !== 'cancelled') {
+            foreach ($order->orderItems as $item) {
+                // Reverse stock from W2 -> W1
+
+                // 1. Increase back to sender warehouse
+                $productWarehouseFrom = ProductWarehouse::where('product_id', $item->product_id)
+                    ->where('warehouse_id', $order->sender_warehouse_id)
+                    ->first();
+
+                if ($productWarehouseFrom) {
+                    $productWarehouseFrom->increment('quantity', $item->quantity);
+                } else {
+                    // If not found, create record
+                    ProductWarehouse::create([
+                        'product_id' => $item->product_id,
+                        'warehouse_id' => $order->sender_warehouse_id,
+                        'quantity' => $item->quantity,
+                    ]);
+                }
+
+                // 2. Decrease from receiver warehouse
+                $productWarehouseTo = ProductWarehouse::where('product_id', $item->product_id)
+                    ->where('warehouse_id', $order->receiver_warehouse_id)
+                    ->first();
+
+                if ($productWarehouseTo && $productWarehouseTo->quantity >= $item->quantity) {
+                    $productWarehouseTo->decrement('quantity', $item->quantity);
+                } else {
+                    throw new \Exception("Receiver warehouse has insufficient stock to reverse for product ID {$item->product_id}");
+                }
+            }
+        }
+
+
         $updateData = [
-            "bed_number" => $requestAppointment["bed_number"],
-            "doctor_id" => $requestAppointment["doctor"],
-            "patient_id" => $requestAppointment["user"],
-            "comment" => $requestAppointment["comment"],
+            "status" => $requestOrder["status"],
         ];
 
-//        if($request->hasFile('avatar')){
-//            $file = $request->file('avatar');
-//            $fileName = md5(microtime()).'_'.$file->getClientOriginalName();
-//            $file->move(public_path('profession_avatar'),$fileName);
-//            if($user->avatar != null){
-//                $old_avatar = $user->avatar;
-//                if(file_exists(public_path('profession_avatar/'.$old_avatar))){
-//                    unlink(public_path('profession_avatar/'.$old_avatar));
-//                }
-//            }
-//
-//        }
-        $appointment->update($updateData);
-//        $user->email = $requestUser->email;
-//
-//        $user->meta_description = $requestUser->phone_number;
-//        $user->description = $requestUser->address;
-////        if($request->hasFile('avatar')){
-////            $user->avatar = $fileName;
-////        }
-//        $user->save();
-        return redirect()->route('admin.orders')->with('success','Appointment updated successfully');
+        $order->update($updateData);
+        return redirect()->route('admin.orders')->with('success','Order status updated successfully');
     }
 
-    public function deleteOrder($id)
+    function canChangeOrderStatus(string $current, string $next): bool
     {
-        $user = Bed::withTrashed()->find($id);
+        $flow = config('order_status.flow');
+
+        $currentIndex = array_search($current, $flow);
+        $nextIndex = array_search($next, $flow);
+
+        // If not found or attempting to go back in flow
+        if ($currentIndex === false || $nextIndex === false || $nextIndex < $currentIndex) {
+            return false;
+        }
+
+        // Special case: allow cancelled at any stage before completed
+        if ($next === 'cancelled' && $current !== 'completed') {
+            return true;
+        }
+
+        return true;
+    }
+
+    public function deleteOrder($id)    {
+        $user = Order::find($id);
         $user->forceDelete();
-        return redirect()->route('admin.orders')->with('success', 'Appointment deleted successfully');
+        return redirect()->route('admin.orders')->with('success', 'Order deleted successfully');
+    }
+
+
+
+
+
+
+
+
+
+    // donations
+
+    public function listDonations()
+    {
+        $orders = Order::with(["senderWarehouse"])
+            ->where("type", "donation")->get();
+
+        return view('admin.pages.donations.index',[
+            "orders" => $orders,
+        ]);
+    }
+
+    public function manageDonation(Request $request,$id)
+    {
+        $appointments = Warehouse::findOrfail($id);
+        if($request->has('status')){
+            $appointments->status = $request->status;
+            $appointments->save();
+            return redirect()->route('admin.appointments')->with('success','User status updated successfully');
+        }
+        return redirect()->route('admin.orders')->with('error','Something went wrong');
+    }
+
+    public function storeDonation(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $requestAppointment = $request->all();
+            // dd($requestAppointment);
+
+            $requestAppointment = $request->validate([
+                'name' => 'required|string|max:255',
+                'from_warehouse_id' => 'required|exists:warehouses,id',
+                'items' => 'required|array|min:1',
+                'items.*.product_id' => 'required|exists:products,id',
+                'items.*.quantity' => 'required|integer|min:1',
+            ]);
+
+            // Calculate total quantity
+            $totalQuantity = array_reduce($requestAppointment["items"], function ($carry, $item) {
+                return $carry + (int) $item['quantity'];
+            }, 0);
+
+            // Stock availability check (BEFORE creating the order)
+            foreach ($requestAppointment["items"] as $item) {
+                $productWarehouseFrom = ProductWarehouse::where('product_id', $item['product_id'])
+                    ->where('warehouse_id', $requestAppointment["from_warehouse_id"])
+                    ->first();
+
+                if (!$productWarehouseFrom || $productWarehouseFrom->quantity < $item['quantity']) {
+                    throw new \Exception("Insufficient stock for product ID {$item['product_id']} in sender warehouse.");
+                }
+            }
+
+            // Create the order
+            $createData = [
+                "sender_warehouse_id" => $requestAppointment["from_warehouse_id"],
+                "user_id" => auth()->user()->id,
+                "username" => $requestAppointment["name"],
+                "quantity" => $totalQuantity,
+                "type" => "donation",
+                "status" => "complete",
+            ];
+
+            $order = Order::create($createData);
+            // dd($order);
+
+            // Handle inventory transfers
+            foreach ($requestAppointment["items"] as $item) {
+                // Reduce stock from sender
+                $productWarehouseFrom = ProductWarehouse::where('product_id', $item['product_id'])
+                    ->where('warehouse_id', $requestAppointment["from_warehouse_id"])
+                    ->first();
+                $productWarehouseFrom->decrement('quantity', $item['quantity']);
+
+                // Create order item
+                OrderItem::create([
+                    "order_id" => $order->id,
+                    "product_id" => $item['product_id'],
+                    "quantity" => $item['quantity'],
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('admin.donations')->with('success', 'Donations created successfully');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('error', 'Error: ' . $e->getMessage());
+        }
+    }
+
+
+    public function showDonation()
+    {
+        $products = Product::get();
+        $warehouses = Warehouse::get();
+        return view('admin.pages.donations.create', [
+            "products" => $products,
+            "warehouses" => $warehouses,
+        ]);
+    }
+
+    public function editDonation($id)
+    {
+        $order = Order::with("senderWarehouse", "receiverWarehouse", "orderItems.product")->findOrFail($id);
+        // $appointment = Bed::with("patient", "doctor")->findOrFail($id);
+        // $doctors = User::whereRoleAndStatus("doctor", "active")->get();
+        // $users = User::whereRoleAndStatus("user", "active")->get();
+        return view('admin.pages.donations.edit',[
+            "order" => $order,
+        ]);
+    }
+
+    // public function updateDonation(Request $request, $id)
+    // {
+    //    $requestUser = $request->validate([
+    //        "status" => "required|string",
+    //    ]);
+    //     $requestOrder = $request->all();
+    //     $order = Order::with("orderItems")->findOrFail($id);
+
+
+    //     $updateData = [
+    //         "status" => $requestOrder["status"],
+    //     ];
+
+    //     $order->update($updateData);
+    //     return redirect()->route('admin.orders')->with('success','Order status updated successfully');
+    // }
+
+    public function deleteDonation($id) {
+        $user = Order::find($id);
+        $user->forceDelete();
+        return redirect()->route('admin.donations')->with('success', 'Donation deleted successfully');
     }
 
 
@@ -866,7 +1088,7 @@ class AdminDashboardController extends Controller
             }else{
                 $token = md5(microtime());
                 $details = [
-                    'title' => 'Mail from HMS',
+                    'title' => 'Mail from Keith Closet',
                     'body' => 'Please click the link below to reset your password',
                     'link' => route('admin.resetPassword',$token)
                 ];

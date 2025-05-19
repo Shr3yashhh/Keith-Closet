@@ -4,12 +4,12 @@
 
 <div class="d-flex justify-content-between">
     <div>
-        <h4 class="mt-2"><i class="fa fa-users mr-1 "></i> List of Orders</h4>
+        <h4 class="mt-2"><i class="fa fa-users mr-1 "></i> List of Donations</h4>
     </div>
     <div class="mt-2">
-        <a href="{{ route('admin.orders.show') }}">
+        <a href="{{ route('admin.donations.show') }}">
             <button class="btn-info">
-                Add Orders
+                Add donation
             </button>
         </a>
     </div>
@@ -39,9 +39,9 @@
         <tr>
           <th>SN</th>
             <th>Sender Warehouse</th>
-            <th>Receiver Warehouse</th>
+            {{-- <th>Receiver Warehouse</th> --}}
           <th>Quantity</th>
-          <th>status</th>
+          <th>Username</th>
             <th>Action</th>
         </tr>
 
@@ -52,9 +52,11 @@
         <tr>
           <td>{{ ++$key }}</td>
             <td>{{ $order->senderWarehouse->name }}</td>
-            <td>{{ $order->receiverWarehouse->name }}</td>
+            {{-- <td>{{ $order->receiverWarehouse->name }}</td> --}}
           <td>{{ $order->quantity }}</td>
-          <td>
+          <td>{{ $order->username }}</td>
+
+          {{-- <td>
             @if ($statusConfig)
                 <span class="text-{{ $statusConfig['color'] }}">
                     {{ $statusConfig['label'] }}
@@ -62,10 +64,10 @@
             @else
                 {{ ucfirst($order->status) }}
             @endif
-        </td>
+        </td> --}}
 
           <td>
-            <a href="{{ route("admin.orders.edit", $order->id) }}" class="btn btn-sm btn-info"> <i class="fas fa-edit mr-1"></i> Edit</a>
+            <a href="{{ route("admin.donations.edit", $order->id) }}" class="btn btn-sm btn-info"> <i class="fas fa-eye mr-1"></i> View</a>
             <a onclick="return confirm('Are you sure?')" href="{{ route('admin.orders.delete', $order->id) }}" class="btn btn-danger btn-sm">Delete</a>
           </td>
         </tr>
@@ -73,7 +75,7 @@
       </table>
       @else
       <p class="mt-3" style="color: red">
-        No any orders found.
+        No any Donation found.
       </p>
 
       @endif

@@ -81,7 +81,7 @@
                                 <input type="password" name="password" class="form-control" />
                             </div>
 
-                            {!! NoCaptcha::display() !!}
+                            {{-- {!! NoCaptcha::display() !!} --}}
 
 
                             <!-- Submit button -->
@@ -94,7 +94,7 @@
                                 </small>
                             </div>
 
-                            {!! NoCaptcha::renderJs() !!}
+                            {{-- {!! NoCaptcha::renderJs() !!} --}}
                         </form>
                     </div>
                 </div>

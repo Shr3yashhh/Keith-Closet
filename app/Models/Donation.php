@@ -5,23 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class OrderItem extends Model
+class Donation extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'order_id',
-        'product_id',
-        'quantity',
+        "full_name",
+        "product_id",
+        "warehouse_id",
+        "quantity",
     ];
-
-    public function order()
-    {
-        return $this->belongsTo(Order::class);
-    }
 
     public function product()
     {
-        return $this->belongsTo(Product::class);
+        // return $this->belongsTo();
     }
 }

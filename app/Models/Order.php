@@ -15,6 +15,8 @@ class Order extends Model
         'receiver_warehouse_id',
         'quantity',
         'status',
+        'type',
+        'username',
     ];
 
     public function orderItems()

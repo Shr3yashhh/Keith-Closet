@@ -5,6 +5,7 @@ use App\Http\Controllers\admin\AdminDashboardController;
 use App\Http\Controllers\admin\ProfessionController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\CkeditorController;
+use App\Http\Middleware\AdminLoginAuth;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'admin-panel'],function(){
@@ -20,6 +21,8 @@ Route::group(['prefix' => 'admin-panel'],function(){
         ->name('admin.forgotPassword');
     Route::any('reset-password',[AdminController::class,'resetPassword'])
         ->name('admin.resetPassword');
+
+    Route::get('reset-login-attempt', [AdminController::class, "resetLoginAttempt"])->name('admin.reset.login.attempt');
 
     // Route::get("reset-password", [AdminController::class, "resetPassword"])->name("admin.reset.password");
 
@@ -155,6 +158,27 @@ Route::group(['prefix' => 'admin-panel'],function(){
             ->name('admin.orders.delete');
         Route::patch('/orders/manage/{id}',[AdminDashboardController::class,'manageOrder'])
             ->name('admin.orders.manage');
+
+
+        // donations
+        Route::get('/donations',[AdminDashboardController::class,'listDonations'])
+            ->name('admin.donations');
+        Route::get('/donations/show',[AdminDashboardController::class,'showDonation'])
+            ->name('admin.donations.show');
+        Route::post('/donations',[AdminDashboardController::class,'storeDonation'])
+            ->name('admin.donations.store');
+        Route::get('/donations/{donations}',[AdminDashboardController::class,'editDonation'])
+            ->name('admin.donations.edit');
+        Route::post('/donations/{donations}',[AdminDashboardController::class,'updateOrder'])
+            ->name('admin.donations.update');
+        Route::get('/donations/soft_delete/{id}',[AdminDashboardController::class,'softDeleteOrder'])
+            ->name('admin.donations.soft_delete');
+        Route::get('/donations/restore/{id}',[AdminDashboardController::class,'restoreOrder'])
+            ->name('admin.donations.restore');
+        Route::get('/donations/delete/{id}',[AdminDashboardController::class,'deleteOrder'])
+            ->name('admin.donations.delete');
+        Route::patch('/donations/manage/{id}',[AdminDashboardController::class,'manageOrder'])
+            ->name('admin.donations.manage');
 
 
         // Profession Route Start

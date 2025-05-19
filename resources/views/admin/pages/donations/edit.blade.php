@@ -37,7 +37,7 @@
          <div class="col-md-12">
              <div class="card">
                  <div class="card-header">
-                     <h3 class="card-title"> <i class="fas fa-edit mr-2"></i><b>Edit Order Status</b> </h3>
+                     <h3 class="card-title"> <i class="fas fa-edit mr-2"></i><b>View Donation</b> </h3>
                      {{-- <a href="{{route('professions.index')}}" class="btn btn-sm btn-info " style="float: right !important;"> <i class="fas fa-eye mr-1"></i> View Profession</a>  --}}
                  </div>
                  <div class="card-body">
@@ -45,19 +45,16 @@
                         @csrf
                         {{-- @method('PUT') --}}
                         <div class="form-group">
+                            <label for="name">Name</label>
+                            <input disabled type="text" class="form-control" id="name" value="{{ $order->username}}" name="name" placeholder="Enter Name">
+                            @error('name')
+                                <span class="text-danger">{{$message}}</span>
+                            @enderror
+                        </div>
+                        <div class="form-group">
                             <label for="from_warehouse_id">From Warehouse</label>
                             <select disabled name="from_warehouse_id" class="form-control" required>
                                 <option value="">{{ $order->senderWarehouse?->name}}</option>
-                                {{-- @foreach($warehouses as $warehouse)
-                                    <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                                @endforeach --}}
-                            </select>
-                        </div>
-
-                        <div class="form-group mt-3">
-                            <label for="to_warehouse_id">To Warehouse</label>
-                            <select disabled name="to_warehouse_id" class="form-control" required>
-                                <option value="">{{ $order->receiverWarehouse?->name}}</option>
                                 {{-- @foreach($warehouses as $warehouse)
                                     <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                                 @endforeach --}}
@@ -98,7 +95,7 @@
                             @endforeach
                         </div>
 
-                        <div class="form-group mt-3">
+                        {{-- <div class="form-group mt-3">
                             <label for="status">status</label>
                             <select name="status" class="form-control" required>
                                 <option value="">Select Status</option>
@@ -106,12 +103,12 @@
                                     <option value="{{ $key }}" {{ $order->status == $key ? 'selected' : '' }}>{{ $status["label"] }}</option>
                                 @endforeach
                             </select>
-                        </div>
+                        </div> --}}
                         {{-- <button type="button" class="btn btn-secondary" id="add-product">Add Product</button> --}}
 
                         {{-- <button type="submit" class="btn btn-primary">Submit</button> --}}
 
-                        <button type="submit" class="btn btn-primary">Update</button>
+                        {{-- <button type="submit" class="btn btn-primary">Update</button> --}}
                     </form>
                  </div>
                  <div class="cart-footer">

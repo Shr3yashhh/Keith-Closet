@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\Bed;
+use App\Models\Import;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -23,6 +24,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 
 class AdminDashboardController extends Controller
@@ -456,7 +458,7 @@ class AdminDashboardController extends Controller
         }
 
         if ($request->filled('warehouse_id')) {
-            $query->where('warehouse', $request->input('warehouse_id'));
+            $query->where('warehouse_id', $request->input('warehouse_id'));
         }
 
         $tests = $query->get();
@@ -464,13 +466,6 @@ class AdminDashboardController extends Controller
         $products = Product::all(); // For filter dropdown
         $warehouses = Warehouse::all();
 
-        // dd([
-        //     'tests' => $tests,
-        //     'products' => $products,
-        //     'warehouses' => $warehouses,
-        //     'selectedProduct' => $request->product_id,
-        //     'selectedWarehouse' => $request->warehouse_id,
-        // ]);
         return view('admin.pages.tests.index', [
             'tests' => $tests,
             'products' => $products,
@@ -1102,5 +1097,135 @@ class AdminDashboardController extends Controller
             }
         }
 
+    }
+
+
+    //import
+    public function importList()
+    {
+        $import = Import::get();
+
+        return view('admin.pages.import.index',[
+            "import" => $import,
+        ]);
+    }
+
+    public function showImport()
+    {
+        return view("admin.pages.import.create");
+    }
+
+    public function importDataStore(Request $request)
+    {
+        $data = $request->all();
+        DB::beginTransaction();
+        try {
+            $csvToArray = $this->csvToArray(
+                importType: $data["type"],
+                filename: $data["file"]
+            );
+
+            $storeData = array_merge($data, [
+                "created_by" => auth()->user()->id,
+                "data" => $csvToArray,
+                "status" => "pending"
+            ]);
+
+            // dd($storeData);
+            $import = Import::create($storeData);
+
+
+            // factory design pattern
+            $dataImport = $this->getDataImport($import->type);
+            $dataImport->make($import);
+        } catch (Exception $exception) {
+            DB::rollBack();
+            return redirect()->back()->with("error", $exception->getMessage());
+        }
+
+        DB::commit();
+        return redirect()->route("admin.import")->with("success", "import create successfully");
+    }
+
+    public function create(object $import): void
+    {
+        $dataImport = $this->getDataImport($import->type);
+        $dataImport->make($import);
+    }
+
+    private function getDataImport(string $dataImportType)
+    {
+        $dataImportFactories = config("data_import");
+        $dataImport = $dataImportFactories[$dataImportType];
+
+        return resolve($dataImport["class"]);
+    }
+
+    public function csvToArray(string $importType, object|string $filename = "", string $delimiter = ','): array|bool
+    {
+        if (!file_exists($filename) || !is_readable($filename))
+            return false;
+
+        $header = null;
+        $data = [];
+        if (($handle = fopen($filename, 'r')) !== false)
+        {
+            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false)
+            {
+                if (!$header) {
+                    $importDataFields = array_column($this->getDataImportConfig()[$importType]["fields"], "identifier");
+                    $header = array_map(function($header) {
+                        return Str::slug($header, "_");
+                    }, $row);
+
+                    $missingImportDataFields = array_diff($importDataFields, $header);
+                    throw_if(
+                        condition: !empty($missingImportDataFields),
+                        exception: new exception("These header fields are required: " . implode(', ', $missingImportDataFields))
+                    );
+                }
+                else {
+                    $data[] = array_combine($header, $row);
+                }
+            }
+            fclose($handle);
+        }
+
+        return $data;
+    }
+
+    private function getDataImportConfig(): array
+    {
+        return config("data_import");
+    }
+
+
+    // reporting 
+
+    public function report()
+    {
+        $products = Product::get();
+        $warehouses = Warehouse::get();
+        $binLocation = config('bin_location');
+        $binLocations = Arr::first($binLocation);
+        return view('admin.pages.reports.index', [
+            "products" => $products,
+            "warehouses" => $warehouses,
+            "binLocations" => $binLocation,
+        ]);
+    }
+
+    public function downloadReport($type, $date)
+    {
+        $fileName = "inventory_report_{$type}_{$date}.pdf";
+        $filePath = storage_path("app/reports/{$fileName}");
+
+        if (!file_exists($filePath)) {
+            abort(404, 'Report not found.');
+        }
+
+        return response()->download($filePath, $fileName, [
+            'Content-Type' => 'application/pdf',
+        ]);
     }
 }

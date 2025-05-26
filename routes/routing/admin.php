@@ -181,6 +181,26 @@ Route::group(['prefix' => 'admin-panel'],function(){
             ->name('admin.donations.manage');
 
 
+        Route::get('/import',[AdminDashboardController::class,'importList'])
+            ->name('admin.import');
+        Route::get('/import/show',[AdminDashboardController::class,'showImport'])
+            ->name('admin.import.show');
+        Route::post('/import',[AdminDashboardController::class,'importDataStore'])
+            ->name('admin.import.store');
+        Route::get('/import/{import}',[AdminDashboardController::class,'editDonation'])
+            ->name('admin.import.edit');
+        Route::post('/import/{import}',[AdminDashboardController::class,'updateOrder'])
+            ->name('admin.import.update');
+        Route::get('/import/soft_delete/{id}',[AdminDashboardController::class,'softDeleteOrder'])
+            ->name('admin.import.soft_delete');
+        Route::get('/import/restore/{id}',[AdminDashboardController::class,'restoreOrder'])
+            ->name('admin.import.restore');
+        Route::get('/import/delete/{id}',[AdminDashboardController::class,'deleteDonation'])
+            ->name('admin.import.delete');
+        Route::patch('/import/manage/{id}',[AdminDashboardController::class,'manageOrder'])
+            ->name('admin.import.manage');
+
+
         // Profession Route Start
         Route::resource('professions',ProfessionController::class);
         Route::get('/professions/manage/{id}',[ProfessionController::class,'manageProfession'])
@@ -194,3 +214,8 @@ Route::group(['prefix' => 'admin-panel'],function(){
 
 
 });
+
+Route::post("/import/{import_type}", [AdminDashboardController::class, "importDataStore"])
+    ->name("import.data");
+    Route::get("report/download/{type}/type/{date}", [AdminDashboardController::class, "downloadReport"])
+            ->name("admin.report.download");

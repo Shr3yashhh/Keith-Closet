@@ -22,7 +22,6 @@ class ResetLoginAttemptMail extends Mailable
     public function build()
     {
         return $this->subject('Reset Your Login Attempts')
-
             ->view('admin.reset-link')
             ->with([
                 'name' => $this->user->name,

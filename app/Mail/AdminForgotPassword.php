@@ -28,7 +28,7 @@ class AdminForgotPassword extends Mailable
     public function build()
     {
         $sub = "Admin Password reset link !";
-        return $this->from('hms@gmail.com', 'KASP')
+        return $this->from('keith@gmail.com', 'KASP')
             ->subject($sub)
             ->view('admin.forgot-password-mail',  [
                 'details' => $this->detail

@@ -90,6 +90,18 @@
                       <p>Donation</p>
                   </a>
               </li>
+              <li class="nav-item">
+                <a href="{{route('admin.import')}}" class="nav-link">
+                    <i class="far fa-user-circle nav-icon"></i>
+                    <p>Import</p>
+                </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{route('admin.import')}}" class="nav-link">
+                  <i class="far fa-user-circle nav-icon"></i>
+                  <p>Report</p>
+              </a>
+          </li>
             </ul>
           </li>
         </ul>

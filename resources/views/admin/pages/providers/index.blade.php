@@ -76,9 +76,9 @@
                       <div class="form-group">
 
                         <select name="status" id="status" class="form-control">
-                          <option value="new" @if ($provider->status == 'new') selected @endif>New</option>
+                          {{-- <option value="new" @if ($provider->status == 'new') selected @endif>New</option> --}}
                           <option value="active" @if ($provider->status == 'active') selected @endif>Active</option>
-                          <option value="suspended" @if ($provider->status == 'suspended') selected @endif>Suspended</option>
+                          {{-- <option value="suspended" @if ($provider->status == 'suspended') selected @endif>Suspended</option> --}}
                         </select>
 
                   </div>

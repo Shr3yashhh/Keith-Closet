@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 
@@ -1200,7 +1201,7 @@ class AdminDashboardController extends Controller
     }
 
 
-    // reporting 
+    // reporting
 
     public function report()
     {
@@ -1227,5 +1228,28 @@ class AdminDashboardController extends Controller
         return response()->download($filePath, $fileName, [
             'Content-Type' => 'application/pdf',
         ]);
+    }
+
+    public function generateReport(Request $request)
+    {
+        // $request->validate([
+        //     'type' => 'required|in:daily,weekly,monthly',
+        // ]);
+
+
+        $data = $request->all();
+        // dd($request->all());
+        Artisan::call('reports:generate', [
+            '--type' => $data["type"] ?? "daily",
+        ]);
+        // $type = $request->input('type');
+        // $date = Carbon::parse($request->input('date'));
+        // $startDate = $date->copy()->startOfDay();
+        // $endDate = $date->copy()->endOfDay();
+
+        // Generate report logic here
+        // ...
+
+        return redirect()->route("admin.dashboard")->with('success', 'Report generated successfully. Please check your email.');
     }
 }

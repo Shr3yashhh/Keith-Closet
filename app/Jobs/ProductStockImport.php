@@ -49,6 +49,14 @@ class ProductStockImport implements ShouldQueue
                     "status" => "processing"
                 ]);
 
+                if (!isset($row['sku']) || !isset($row['warehouse']) || !isset($row['quantity'])) {
+                    $importData->update([
+                        "status" => "failed",
+                        // "error_message" => "Missing required fields: sku, warehouse, or quantity."
+                    ]);
+                    continue;
+                }
+
                 $product = Product::where("sku", $row['sku'])->first();
 
                 if (!$product) {

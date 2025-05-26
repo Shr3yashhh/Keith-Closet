@@ -200,6 +200,9 @@ Route::group(['prefix' => 'admin-panel'],function(){
         Route::patch('/import/manage/{id}',[AdminDashboardController::class,'manageOrder'])
             ->name('admin.import.manage');
 
+        Route::get("generate-report", [AdminDashboardController::class, "generateReport"])
+            ->name("admin.report.generate");
+
 
         // Profession Route Start
         Route::resource('professions',ProfessionController::class);

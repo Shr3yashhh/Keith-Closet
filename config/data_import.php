@@ -38,6 +38,10 @@ return [
             [
                 "identifier" => "warehouse",
                 "label" => "Warehouse",
+            ],
+            [
+                "identifier" => "sex",
+                "label" => "SEX",
             ]
         ],
     ],

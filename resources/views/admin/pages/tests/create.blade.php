@@ -20,7 +20,7 @@
                             <select class="form-control" name="product" required>
                                 <option value="" disabled selected>Select a product</option>
                                 @foreach($products as $product)
-                                    <option value="{{ $product->id }}">{{ $product->name }}</option>
+                                    <option value="{{ $product->id }}">{{ "{$product->name} ({$product->size})"}}</option>
                                 @endforeach
                             </select>
                             @error('product')

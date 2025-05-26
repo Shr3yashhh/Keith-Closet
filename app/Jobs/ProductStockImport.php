@@ -65,6 +65,7 @@ class ProductStockImport implements ShouldQueue
                         "name" => $row['sku'] ?? 'Unknown Product',
                         "category" => $row['category'] ?? '',
                         "size" => $row['size'] ?? '',
+                        "sex" => $row["sex"] ?? "Unisex",
                     ]);
                 }
                 $warehouse = Warehouse::where("code", $row["warehouse"])->first();

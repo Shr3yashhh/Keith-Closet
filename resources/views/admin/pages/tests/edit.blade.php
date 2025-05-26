@@ -42,9 +42,9 @@
                         <div class="form-group">
                             <label for="product">Product</label>
                             <select class="form-control" name="product" placeholder="Enter Product">
-                                <option value="{{ $test->product->id }}" default> {{ $test->product->name }}</option>
+                                <option value="{{ $test->product->id }}" default> {{ $test->product->name }} ({{$product->size ?? ""}})</option>
                             @foreach($products as $product)
-                                    <option value="{{ $product->id }}">{{ $product->name }}</option>
+                                    <option value="{{ $product->id }}">{{ $product->name }} ({{$product->size ?? ""}})</option>
                                 @endforeach
                             </select>
                             @error('product')

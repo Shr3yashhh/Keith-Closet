@@ -23,7 +23,6 @@
                             <input required type="text" class="form-control" name="code" placeholder="Enter Code">
                             @error('code')
                                 <span class="text-danger">{{$message}}</span>
-
                             @enderror
                         </div>
                         <div class="form-group">
